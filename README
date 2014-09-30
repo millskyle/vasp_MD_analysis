@@ -1,0 +1,20 @@
+This code analyses the vasprun.xml file and produces data and plotting scripts which can be run to produce plots of the data contained in vasprun.xml.
+
+THIS IS A WORK IN PROGRESS
+
+In order to compile this:
+
+cd src
+cd yaml-cpp
+make
+sudo make install
+cd ..
+
+
+The executable will be placed in src/.  Run it by executing
+
+./run
+
+
+
+Kyle

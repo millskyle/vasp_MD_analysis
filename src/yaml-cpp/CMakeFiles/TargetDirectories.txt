@@ -1,0 +1,3 @@
+/home/kmills/Work/kmills/BoronNitrideAluminum/cppanalysis/src/yaml-cpp/CMakeFiles/debuggable.dir
+/home/kmills/Work/kmills/BoronNitrideAluminum/cppanalysis/src/yaml-cpp/CMakeFiles/releasable.dir
+/home/kmills/Work/kmills/BoronNitrideAluminum/cppanalysis/src/yaml-cpp/CMakeFiles/yaml-cpp.dir

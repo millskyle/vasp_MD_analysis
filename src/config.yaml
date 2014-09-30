@@ -1,0 +1,24 @@
+files:
+  log: "log"
+  script_wrapper: "output/make_all_plots.sh"
+
+
+plots:
+  msd: True
+  msd_data_prefix: "msd_"
+  msd_atoms: 'Al   B   N'
+
+
+  rdf: True
+  rdf_data_prefix: "rdf_"
+  rdf_atoms: 'Al B N'
+  rdf_bins: 500
+  rdf_cut_half_lv: True
+  rdf_plot_type: "lines"
+
+
+
+
+
+
+

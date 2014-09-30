@@ -1,0 +1,26 @@
+#!/bin/bash
+
+
+#MUST have vmd installed and accessible by the command 'vmd'.
+
+if [ "x"$1 == "x" ]; then
+   echo "USAGE:  ./xml2xyz 'fileToConvert.xml' "
+fi
+
+
+echo '
+   set fname [lindex $argv 0]
+   mol new $fname type {xml}  first 0 last -1 step 1 waitfor all
+   set nframes [ molinfo top get numframes ]
+   incr nframes -1
+   set ext ".xyz"
+   set outputfile $fname$ext
+   animate write xyz $outputfile beg 0 end $nframes skip 1 0
+   exit
+' > /tmp/vmdtemp.tcl
+
+vmd -e /tmp/vmdtemp.tcl -args $1  >/dev/null 2>&1
+
+rm /tmp/vmdtemp.tcl
+
+
