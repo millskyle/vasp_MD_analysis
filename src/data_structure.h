@@ -15,6 +15,7 @@ struct TimeStep {
    vector<threevector> fff;
    double MSD=-999;
    vector<double> COM;
+   double density=0;
    TimeStep() {
       COM.push_back(0);
       COM.push_back(0);
@@ -187,6 +188,12 @@ struct Configuration {
    string msd_data_prefix;
    vector<string> msd_atoms;
 
+   bool rho;
+   string rho_data_prefix;
+   vector<string> rho_atoms;
+
+
+
    bool rdf;
    string rdf_data_prefix;
    vector<string> rdf_atoms;
@@ -200,7 +207,7 @@ struct Configuration {
    ofstream log;
    string log_file_location = "log";
   
-   
+      
 
 
    

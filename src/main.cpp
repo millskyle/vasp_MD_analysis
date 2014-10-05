@@ -5,11 +5,9 @@
 
 #include "msd.cpp"
 #include "rdf.cpp"
+#include "rho.cpp"
 
 using namespace std;
-
-
-
 
 
 int main() {
@@ -26,9 +24,11 @@ int main() {
    if (config.msd) {
       mean_square_displacement(&v, &config);
    }
-
- if (config.rdf) {
+   if (config.rdf) {
       radial_distribution_function(&v, &config);
+   }
+   if (config.rho) {
+      global_density(&v, &config);
    }
 
    config.script_wrapper.close();

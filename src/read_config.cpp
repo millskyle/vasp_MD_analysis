@@ -40,6 +40,13 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "rdf_plot_type",config.rdf_plot_type);
    parse(plots, "rdf_atoms", config.tempstr);
       config.rdf_atoms = str2vec(config.tempstr);
+
+   parse(plots, "rho",config.rho);
+   parse(plots,"rho_atoms",config.tempstr);
+      config.rho_atoms = str2vec(config.tempstr);
+   parse(plots, "rho_data_prefix", config.rho_data_prefix);
+
+
 }
 
 
