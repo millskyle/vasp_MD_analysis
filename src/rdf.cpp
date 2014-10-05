@@ -65,8 +65,12 @@ int radial_distribution_function(FileInfo *vasprun, Configuration *config) {
       double sum_volume = 0;
       //for each timestep which we have positions for
       for (int t=1; t < atomobject->timesteps.size()-2; t++ ) {
-         xmin,ymin,zmin = 100000000000;
-         xmax,ymax,zmax = 0;
+         xmin = 1e10;
+         ymin = 1e10;
+         zmin = 1e10;
+         xmax = 0;
+         ymax = 0;
+         zmax = 0;
          //for each atom in the position vector of vectors
          for (int a=0; a<atomobject->atomspertype-1; a++) {
             xa = atomobject->timesteps[t].ppp[a][0];
@@ -109,8 +113,7 @@ int radial_distribution_function(FileInfo *vasprun, Configuration *config) {
    //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
    of2 << "'" << config->rdf_data_prefix + atomobject->element << ".data' with " << config->rdf_plot_type << " title '" << atomobject->element << "' , ";
 
-   double fudge = 5.0;
-   double atomic_density = fudge * atomobject->atomspertype / (sum_volume/atomobject->timesteps.size());
+   double atomic_density = atomobject->atomspertype / (sum_volume/atomobject->timesteps.size());
    //write each timestep to a file
    for (int n=0; n < nbins-1; n++) {
       double normalization = atomic_density / (4*3.14159264*bin_cutoff[n]*bin_cutoff[n]*bin_width*atomobject->timesteps.size() );
