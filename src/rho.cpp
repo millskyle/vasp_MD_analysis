@@ -11,22 +11,13 @@ int global_density(FileInfo *vasprun, Configuration *config) {
 
    cout << "--- Starting Density calculations ---" <<endl;
    cout << "Density plots requested for " << config->rho_atoms.size() << " atom types: " << vec2str(config->rho_atoms) << endl;
-   //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
-   //vasprun->unwrap(); 
-   
-   //Start a simple bash script which calls GNUplot to plot the msd data
-   ofstream of2;
-   of2.open("output/plot_rho.sh");
-   of2 << "#!/bin/bash" << "\n" 
-       << "gnuplot -persist << GNUPLOTINPUT" << "\n"
-       << "set title \"Density vs. Time\"\n"
-       << "set term pdf\n"
-       << "set output \"rho.pdf\"\n"
-       << "set xlabel \"Time, picoseconds\"\n"
-       << "set yrange [0:]\n"
-       << "set ylabel \"Density, atoms per cubic Angstrom\"\n"
-//       << "unset key" << "\n"
-       << "plot ";
+  
+  
+   //Make a gnuplot object.  It takes care of writing the data to a script. 
+   GnuPlotScript gnuplot ;
+   gnuplot.initialise("rho","Density vs. time","Time, [picoseconds]","Density","rho.pdf");
+   gnuplot.command("set yrange [0:]");
+   gnuplot.command("plot ",false);
 
    //For each atom in the requested atom types
    for (int atomname=0; atomname < config->rho_atoms.size(); atomname++) {
@@ -60,12 +51,35 @@ int global_density(FileInfo *vasprun, Configuration *config) {
    of.open("output/" + config->rho_data_prefix + atomobject->element + ".data");
 
    //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
-   of2 << "'" << config->rho_data_prefix + atomobject->element << ".data' using (\\$0*" << vasprun->dt << "*0.001):1 with lines title '" << atomobject->element << " (effective)' , ";
-   of2 << "'" << config->rho_data_prefix + atomobject->element << ".data' using (\\$0*" << vasprun->dt << "*0.001):2 with lines title '" << atomobject->element << " (real)' , ";
+   gnuplot.command("'" 
+      + config->rho_data_prefix 
+      + atomobject->element 
+      + ".data' using ($0*" 
+      + to_string(vasprun->dt) 
+      + "*0.001):1 with lines title '" 
+      + atomobject->element 
+      + " (effective)' ls " 
+      + gnuplot.style() 
+      + " lw 3 , "
+      ,false);
+
+   gnuplot.command("'" 
+      + config->rho_data_prefix 
+      + atomobject->element 
+      + ".data' using ($0*" 
+      + to_string(vasprun->dt) 
+      + "*0.001):2 with lines title '" 
+      + atomobject->element 
+      + " (real)' ls " 
+      + gnuplot.style() 
+      + " lw 3, "
+      , false);
+
+
 
    //write each timestep to a file
    for (int t=0; t < atomobject->timesteps.size(); t++) {
-      if (atomobject->timesteps[t].MSD>=0) {
+      if (atomobject->timesteps[t].density>0) {
          of << (  atomobject->timesteps[t].density * pow(converter.angstroms_per_cm,3)*
                   atomobject->mass *
                   converter.moles_per_gram )  << 
@@ -84,12 +98,11 @@ int global_density(FileInfo *vasprun, Configuration *config) {
 
 
 
-   //Close off the GNUPlot bash script
-   of2 << "\nGNUPLOTINPUT\n";
-   of2.close();
+   //Close off the GNUPlot
+   gnuplot.close();
 
    //add a command to the global plot script to make the msd plots
-   config->script_wrapper << "\nbash plot_rho.sh \n" ;   
+   config->script_wrapper << "\ngnuplot plot_rho.gnu \n" ;   
 
    return 0;
 
