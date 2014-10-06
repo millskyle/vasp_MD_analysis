@@ -22,12 +22,12 @@ plots:
   rho_atoms: 'Al'
 
 
-  spatial_distribution: True
-  collapse_dimension: 2   #x=0, y=1, z=2
+  spatial_distribution_projection: True
+  spatial_distribution_lattice: True
   lattice_atoms: 'B N'
   liquid_atoms: 'Al'
-  nbins_x: 50
-  nbins_y: 50
+  nbins_x: 200
+  nbins_y: 200
 
   
 
