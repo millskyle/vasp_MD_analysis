@@ -46,7 +46,8 @@ void parse_inputfile(Configuration& config, const Node& node) {
       config.rho_atoms = str2vec(config.tempstr);
    parse(plots, "rho_data_prefix", config.rho_data_prefix);
 
-   parse(plots, "spatial_distribution", config.spatial_distribution);
+   parse(plots, "spatial_distribution_projection", config.spatial_distribution_projection);
+   parse(plots, "spatial_distribution_lattice", config.spatial_distribution_projection);
    parse(plots, "collapse_dimension", config.collapse_dimension);
    parse(plots, "lattice_atoms", config.tempstr);
       config.lattice_atoms = str2vec(config.tempstr);
@@ -54,7 +55,7 @@ void parse_inputfile(Configuration& config, const Node& node) {
       config.liquid_atoms = str2vec(config.tempstr);
    parse(plots, "nbins_x", config.nbins_x);
    parse(plots, "nbins_y", config.nbins_y);
-
+   
 
 
 }

@@ -192,7 +192,8 @@ struct Configuration {
    string rho_data_prefix;
    vector<string> rho_atoms;
 
-   bool spatial_distribution;
+   bool spatial_distribution_projection;
+   bool spatial_distribution_lattice;
    int collapse_dimension;
    vector<string> lattice_atoms;
    vector<string> liquid_atoms;
@@ -243,12 +244,12 @@ struct GnuPlotScript {
          script << "\n";
       } 
    }
-   void initialise(string iname,string ititle,string ixlabel,string iylabel,string ioutput) {
+   void initialise(string iname,string ititle,string ixlabel,string iylabel,string ioutput, string icmap="Set2") {
       name = iname;
       title = ititle;
       xlabel = ixlabel;
       ylabel = iylabel;
-      cmap = "Set2";
+      cmap = icmap;
       output = ioutput;
       linestyle = 1;
  
