@@ -192,7 +192,12 @@ struct Configuration {
    string rho_data_prefix;
    vector<string> rho_atoms;
 
-
+   bool spatial_distribution;
+   int collapse_dimension;
+   vector<string> lattice_atoms;
+   vector<string> liquid_atoms;
+   int nbins_x;
+   int nbins_y;
 
    bool rdf;
    string rdf_data_prefix;
@@ -214,8 +219,51 @@ struct Configuration {
 } config;
 
 
-
+struct GnuPlotScript {
+   string name;
+   string title;
+   string xlabel;
+   string ylabel;
+   string cmap;
+   string output;
+   int linestyle;
+   ofstream script; 
+   
+   string style() {
+      linestyle++;
+      if (linestyle >=8) {
+         linestyle=1;
+      }
+      return to_string(linestyle);
+   }
+   
+   void command(string str,bool newline=true) {
+      script << str;
+      if (newline) {
+         script << "\n";
+      } 
+   }
+   void initialise(string iname,string ititle,string ixlabel,string iylabel,string ioutput) {
+      name = iname;
+      title = ititle;
+      xlabel = ixlabel;
+      ylabel = iylabel;
+      cmap = "Set2";
+      output = ioutput;
+      linestyle = 1;
+ 
+      script.open("output/plot_" + name + ".gnu");
+      script << "#!/usr/bin/gnuplot\n\nreset\n"
+              << "set title \"" << title << "\"\n"
+              << "set term pdf\n"
+              << "set output \"" << output << "\"\n"
+              << "set xlabel \"" << xlabel << "\"\n"
+              << "set ylabel \"" << ylabel << "\"\n"
+              << "load '../supporting/plotting/gnuplot_colormaps/" + cmap + ".plt' \n";
+   }
+   void close() {
+      script.close();
+   }
+};
 
 #endif
-
-
