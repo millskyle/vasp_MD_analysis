@@ -11,18 +11,10 @@ int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
    //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
    vasprun->unwrap(); 
    
-   //Start a simple bash script which calls GNUplot to plot the msd data
-   ofstream of2;
-   of2.open("output/plot_msd.sh");
-   of2 << "#!/bin/bash" << "\n" 
-       << "gnuplot -persist << GNUPLOTINPUT" << "\n"
-       << "set title \"Mean Square Displacement\"\n"
-       << "set term pdf\n"
-       << "set output \"msd.pdf\"\n"
-       << "set xlabel \"Time, picoseconds\"\n"
-       << "set ylabel \"distance, Angstroms\"\n"
-//       << "unset key" << "\n"
-       << "plot ";
+   //Make a gnuplot object.  It takes care of writing the data to a script.
+   GnuPlotScript gnuplot ;
+   gnuplot.initialise("msd","Mean Square displacement","Time, [picoseconds]","Disance, angstroms","msd.pdf");
+   gnuplot.command("plot ",false);
 
 
    //For each atom in the requested atom types
@@ -68,7 +60,17 @@ int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
    of.open("output/" + config->msd_data_prefix + atomobject->element + ".data");     
        
    //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
-   of2 << "'" << config->msd_data_prefix + atomobject->element << ".data' using (\\$0*" << vasprun->dt << "*0.001):1 with lines title '" << atomobject->element << "' , ";
+   gnuplot.command("'" 
+      + config->msd_data_prefix 
+      + atomobject->element 
+      + ".data' using ($0*" 
+      + to_string(vasprun->dt)
+      + "*0.001):1 with lines title '" 
+      + atomobject->element 
+      + "' ls "
+      + gnuplot.style()
+      + " lw 3 , "
+      ,false);
 
    //write each timestep to a file
    for (int t=0; t < atomobject->timesteps.size(); t++) {
@@ -82,12 +84,9 @@ int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
    
 }
 
-   //Close off the GNUPlot bash script
-   of2 << "\nGNUPLOTINPUT\n";
-   of2.close();
-
+   gnuplot.close();
    //add a command to the global plot script to make the msd plots
-   config->script_wrapper << "\nbash plot_msd.sh \n" ;   
+   config->script_wrapper << "\ngnuplot plot_msd.gnu \n" ;   
 
    return 0;
 
