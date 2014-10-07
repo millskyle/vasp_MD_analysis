@@ -3,9 +3,9 @@
 
 #include "data_structure.h"
 
-int nint(float x) {
+/* int nint(float x) {
    return floor(x+0.5);
-}
+} */
 
 
 int radial_distribution_function(FileInfo *vasprun, Configuration *config) {

@@ -4,10 +4,25 @@
 #include <vector>
 #include <stdio.h>
 #include <string.h>
+#include <fstream>
+#include <iostream>
 
 using namespace std;
 
 
+
+int count_atoms_in_box_pointer(vector<threevector>* positions, double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) { 
+   int total=0;
+   for (int a=0; a<positions->size();a++) {
+      if ((*positions)[a][0] <= xmax && (*positions)[a][0] > xmin &&  (*positions)[a][1] <= ymax &&
+          (*positions)[a][1] > ymin &&  (*positions)[a][2] <= zmax && (*positions)[a][2] > zmin)
+       {
+          total +=1;
+       }
+   }
+
+return total;
+}
 
 int count_atoms_in_box(vector<threevector> positions, double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) { 
    int total=0;
@@ -57,6 +72,32 @@ return sv;
 }
 return sv;
 }
+
+int nint(float x) {
+   return floor(x+0.5);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
