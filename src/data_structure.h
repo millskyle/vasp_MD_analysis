@@ -256,7 +256,7 @@ struct GnuPlotScript {
       script.open("output/plot_" + name + ".gnu");
       script << "#!/usr/bin/gnuplot\n\nreset\n"
               << "set title \"" << title << "\"\n"
-              << "set term pdf\n"
+              << "set term pdf font \"Times,8\"\n"
               << "set output \"" << output << "\"\n"
               << "set xlabel \"" << xlabel << "\"\n"
               << "set ylabel \"" << ylabel << "\"\n"
