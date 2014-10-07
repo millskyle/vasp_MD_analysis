@@ -24,10 +24,11 @@ plots:
 
   spatial_distribution_projection: True
   spatial_distribution_lattice: True
+  collapse_dimension: 2
   lattice_atoms: 'B N'
   liquid_atoms: 'Al'
-  nbins_x: 200
-  nbins_y: 200
+  nbins_x: 75
+  nbins_y: 75
 
   
 
