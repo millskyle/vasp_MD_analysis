@@ -5,11 +5,10 @@
 
 #include "msd.cpp"
 #include "rdf.cpp"
+#include "rho.cpp"
+#include "spatial_dist.cpp"
 
 using namespace std;
-
-
-
 
 
 int main() {
@@ -26,13 +25,20 @@ int main() {
    if (config.msd) {
       mean_square_displacement(&v, &config);
    }
-
- if (config.rdf) {
+   if (config.rdf) {
       radial_distribution_function(&v, &config);
+   }
+   if (config.rho) {
+      global_density(&v, &config);
+   }
+   if (config.spatial_distribution_projection) {
+      spatial_distribution_projection(&v, &config);
    }
 
    config.script_wrapper.close();
    return 0;
+   
+
 }
 
 

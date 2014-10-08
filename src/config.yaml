@@ -16,6 +16,21 @@ plots:
   rdf_cut_half_lv: True
   rdf_plot_type: "lines"
 
+  #Global density plots (density of the entire region occupied by rho_atoms
+  rho: True
+  rho_data_prefix: "rho_"
+  rho_atoms: 'Al'
+
+
+  spatial_distribution_projection: True
+  spatial_distribution_lattice: True
+  lattice_atoms: 'B N'
+  liquid_atoms: 'Al'
+  nbins_x: 200
+  nbins_y: 200
+
+  
+
 
 
 

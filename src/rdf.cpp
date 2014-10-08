@@ -17,16 +17,11 @@ int radial_distribution_function(FileInfo *vasprun, Configuration *config) {
    vasprun->unwrap(); 
    
    //Start a simple bash script which calls GNUplot to plot the msd data
-   ofstream of2;
-   of2.open("output/plot_rdf.sh");
-   of2 << "#!/bin/bash" << "\n" 
-       << "gnuplot -persist << GNUPLOTINPUT" << "\n"
-       << "set title \"Radial Distribution Function, g(r)\"\n"
-       << "set term pdf\n"
-       << "set output \"rdf.pdf\"\n"
-       << "set xlabel \"r, Angstroms\"\n"
-       << "set ylabel \"g(r)\"\n"
-       << "plot ";
+
+   GnuPlotScript gnuplot;
+   gnuplot.initialise("rdf","Radial distribution function","r, Angstroms","g(r)","rdf.pdf");
+   gnuplot.command("plot ", false);
+
 
    //find the minimum cell dimension...we can't plot the RDF past half of this.
    double minimum_dimension = 10000000000000000;
@@ -65,8 +60,12 @@ int radial_distribution_function(FileInfo *vasprun, Configuration *config) {
       double sum_volume = 0;
       //for each timestep which we have positions for
       for (int t=1; t < atomobject->timesteps.size()-2; t++ ) {
-         xmin,ymin,zmin = 100000000000;
-         xmax,ymax,zmax = 0;
+         xmin = 1e10;
+         ymin = 1e10;
+         zmin = 1e10;
+         xmax = 0;
+         ymax = 0;
+         zmax = 0;
          //for each atom in the position vector of vectors
          for (int a=0; a<atomobject->atomspertype-1; a++) {
             xa = atomobject->timesteps[t].ppp[a][0];
@@ -102,35 +101,36 @@ int radial_distribution_function(FileInfo *vasprun, Configuration *config) {
          sum_volume+=(xmax-xmin)*(ymax-ymin)*(zmax-zmin); //volume taken by atoms this timestep
       }
   
-   //write out the data for this element to an element-specific file
-   ofstream of;
-   of.open("output/" + config->rdf_data_prefix + atomobject->element + ".data");     
+      //write out the data for this element to an element-specific file
+      ofstream of;
+      of.open("output/" + config->rdf_data_prefix + atomobject->element + ".data");     
        
-   //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
-   of2 << "'" << config->rdf_data_prefix + atomobject->element << ".data' with " << config->rdf_plot_type << " title '" << atomobject->element << "' , ";
+      //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
+      gnuplot.command("'" 
+         + config->rdf_data_prefix 
+         + atomobject->element 
+         + ".data' with lines title '" 
+         + atomobject->element 
+         + "' ls " 
+         + gnuplot.style() 
+         + " lw 3 , "
+         , false);
 
-   double fudge = 5.0;
-   double atomic_density = fudge * atomobject->atomspertype / (sum_volume/atomobject->timesteps.size());
-   //write each timestep to a file
-   for (int n=0; n < nbins-1; n++) {
-      double normalization = atomic_density / (4*3.14159264*bin_cutoff[n]*bin_cutoff[n]*bin_width*atomobject->timesteps.size() );
-      of << bin_cutoff[n] << "\t" << bins[n]*normalization << "\n" ;
-//      cout << bin_cutoff[n] << "\t" << bins[n]*normalization << "\n" ;
+      double atomic_density = atomobject->atomspertype / (sum_volume/atomobject->timesteps.size());
+      //write each timestep to a file
+      for (int n=0; n < nbins-1; n++) {
+         double normalization = atomic_density / (4*3.14159264*bin_cutoff[n]*bin_cutoff[n]*bin_width*atomobject->timesteps.size() );
+         of << bin_cutoff[n] << "\t" << bins[n]*normalization << "\n" ;
+      }
+      of.close();
+
    }
-   of.close();
 
-   
-
-
-
-   }
-
-   //Close off the GNUPlot bash script
-   of2 << "\nGNUPLOTINPUT\n";
-   of2.close();
+   //Close off the GNUPlot script
+   gnuplot.close();
 
    //add a command to the global plot script to make the msd plots
-   config->script_wrapper << "\nbash plot_rdf.sh \n" ;   
+   config->script_wrapper << "\ngnuplot plot_rdf.gnu \n" ;   
 
    return 0;
 

@@ -15,6 +15,7 @@ struct TimeStep {
    vector<threevector> fff;
    double MSD=-999;
    vector<double> COM;
+   double density=0;
    TimeStep() {
       COM.push_back(0);
       COM.push_back(0);
@@ -187,6 +188,18 @@ struct Configuration {
    string msd_data_prefix;
    vector<string> msd_atoms;
 
+   bool rho;
+   string rho_data_prefix;
+   vector<string> rho_atoms;
+
+   bool spatial_distribution_projection;
+   bool spatial_distribution_lattice;
+   int collapse_dimension;
+   vector<string> lattice_atoms;
+   vector<string> liquid_atoms;
+   int nbins_x;
+   int nbins_y;
+
    bool rdf;
    string rdf_data_prefix;
    vector<string> rdf_atoms;
@@ -200,15 +213,58 @@ struct Configuration {
    ofstream log;
    string log_file_location = "log";
   
-   
+      
 
 
    
 } config;
 
 
-
+struct GnuPlotScript {
+   string name;
+   string title;
+   string xlabel;
+   string ylabel;
+   string cmap;
+   string output;
+   int linestyle;
+   ofstream script; 
+   
+   string style() {
+      linestyle++;
+      if (linestyle >=8) {
+         linestyle=1;
+      }
+      return to_string(linestyle);
+   }
+   
+   void command(string str,bool newline=true) {
+      script << str;
+      if (newline) {
+         script << "\n";
+      } 
+   }
+   void initialise(string iname,string ititle,string ixlabel,string iylabel,string ioutput, string icmap="Set2") {
+      name = iname;
+      title = ititle;
+      xlabel = ixlabel;
+      ylabel = iylabel;
+      cmap = icmap;
+      output = ioutput;
+      linestyle = 1;
+ 
+      script.open("output/plot_" + name + ".gnu");
+      script << "#!/usr/bin/gnuplot\n\nreset\n"
+              << "set title \"" << title << "\"\n"
+              << "set term pdf\n"
+              << "set output \"" << output << "\"\n"
+              << "set xlabel \"" << xlabel << "\"\n"
+              << "set ylabel \"" << ylabel << "\"\n"
+              << "load '../supporting/plotting/gnuplot_colormaps/" + cmap + ".plt' \n";
+   }
+   void close() {
+      script.close();
+   }
+};
 
 #endif
-
-
