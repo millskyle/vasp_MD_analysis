@@ -81,6 +81,10 @@ int spatial_distribution_projection(FileInfo *vasprun, Configuration *config) {
 
        }
    } 
+
+   
+   double norm;
+   norm = (vasprun->latt[dim1][dim1] / nbins_x) * (vasprun->latt[dim2][dim2] / nbins_y) * vasprun->latt[config->collapse_dimension][config->collapse_dimension] * vasprun->ntimesteps * vasprun->dt ;
  
    ofstream of;
    of.open("output/sdp.data");
@@ -88,7 +92,7 @@ int spatial_distribution_projection(FileInfo *vasprun, Configuration *config) {
    for (int ix=0; ix < nbins_x-1; ix++){
    //for each bin in the y direction
       for (int iy=0; iy < nbins_y-1; iy++) {
-         of << bins[ix][iy] << "\t" ;
+         of << bins[ix][iy] / norm << "\t" ;
       }
       of << "\n";
    }

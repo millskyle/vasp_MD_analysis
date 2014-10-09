@@ -5,7 +5,7 @@
 # author: Anna Schneider
 
 # line styles
-set style line 1 lc rgb '#FFFFCC' # very light yellow-orange-red
+set style line 1 lc rgb '#FFFFFF' # very light yellow-orange-red
 set style line 2 lc rgb '#FFEDA0' # 
 set style line 3 lc rgb '#FED976' # light yellow-orange-red
 set style line 4 lc rgb '#FEB24C' # 
@@ -15,7 +15,7 @@ set style line 7 lc rgb '#E31A1C' #
 set style line 8 lc rgb '#B10026' # dark yellow-orange-red
 
 # palette
-set palette defined ( 0 '#FFFFCC',\
+set palette defined ( 0 '#FFFFFF',\
     	    	      1 '#FFEDA0',\
 		      2 '#FED976',\
 		      3 '#FEB24C',\

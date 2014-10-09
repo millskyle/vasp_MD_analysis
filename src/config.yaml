@@ -6,12 +6,12 @@ files:
 plots:
   msd: True
   msd_data_prefix: "msd_"
-  msd_atoms: 'Al   B   N'
+  msd_atoms: 'Al   '
 
 
   rdf: True
   rdf_data_prefix: "rdf_"
-  rdf_atoms: 'Al B N'
+  rdf_atoms: 'Al '
   rdf_bins: 500
   rdf_cut_half_lv: True
   rdf_plot_type: "lines"
