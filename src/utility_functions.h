@@ -129,9 +129,19 @@ vector<string> string_split_to_vector2(string s) {
 struct Conversions {
       double angstroms_per_cm = 1e8;
       double cm_per_angstrom = 1e-8;
+
+      double m2A = 1e10;
+      double A2m = 1/1e10;
+      
+      double to_micro=1e6;
+      double to_nano= 1e9;
+      double to_pico=1e12;
+      double to_femto=1e15;
    
       double atoms_per_mole = 6.0221412927e23;
       double moles_per_gram = 1.0 / atoms_per_mole ;
+      double pico2femto = 1000;
+      double femto2pico = 1.0/pico2femto;
 
   Conversions(){
   }
