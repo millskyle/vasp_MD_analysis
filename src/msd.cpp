@@ -2,6 +2,7 @@
 #define MSD_H
 
 #include "data_structure.h"
+#include "utility_functions.h"
 
 int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
    if (!config->msd) {cout << "\nMSD called but not requested in configuration. Exiting"; return 1;}
@@ -10,10 +11,11 @@ int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
    cout << "MSD requested for " << config->msd_atoms.size() << " atom types: " << vec2str(config->msd_atoms) << endl;
    //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
    vasprun->unwrap(); 
+   Conversions convert;
    
    //Make a gnuplot object.  It takes care of writing the data to a script.
    GnuPlotScript gnuplot ;
-   gnuplot.initialise("msd","Mean Square displacement","Time, [picoseconds]","Disance, angstroms","msd.pdf");
+   gnuplot.initialise("msd","Mean Square displacement","Time, [picoseconds]","Disance squared, angstroms^2","msd.pdf");
    gnuplot.command("plot ",false);
 
 
@@ -70,12 +72,26 @@ int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
       + "' ls "
       + gnuplot.style()
       + " lw 3 , "
+      + " '"
+      + config->msd_data_prefix
+      + atomobject->element
+      + ".data' using ($0*"
+      + to_string(vasprun->dt)
+      + "*0.001):2 with lines title '"
+      + "Theoretical"
+      + "' ls "
+      + gnuplot.style()
+      + " lw 3 ,"
       ,false);
 
+   double experiment_diffusion_coefficient = 7.8e-9; //in m^2/s 
    //write each timestep to a file
    for (int t=0; t < atomobject->timesteps.size(); t++) {
       if (atomobject->timesteps[t].MSD>=0) {
-         of << atomobject->timesteps[t].MSD << "\n" ;
+         of << atomobject->timesteps[t].MSD 
+            << "\t" 
+            << 6*experiment_diffusion_coefficient * (t*vasprun->dt*convert.femto2pico)   * ( convert.m2A * convert.m2A / convert.to_pico   )
+            << "\n" ;
 //         cout << atomobject->timesteps[t].MSD << "\n" ;
       }
    }
