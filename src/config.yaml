@@ -30,7 +30,11 @@ plots:
   nbins_x: 75
   nbins_y: 75
 
-  
+  forces: True
+  forces_from_atom: 'Al'
+  forces_to_atoms: 'B'
+  forces_bins: 1000
+
 
 
 

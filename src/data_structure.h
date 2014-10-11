@@ -206,6 +206,14 @@ struct Configuration {
    bool rdf_cut_half_lv;
    string rdf_plot_type;   
    
+
+   bool forces;
+   string forces_from_atom;
+   vector<string> forces_to_atoms;
+   int forces_bins;
+
+
+
    ofstream script_wrapper;
    string script_wrapper_location = "output/make_all_plots.sh";
 

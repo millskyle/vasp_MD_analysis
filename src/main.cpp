@@ -6,6 +6,7 @@
 #include "rdf.cpp"
 #include "rho.cpp"
 #include "spatial_dist.cpp"
+#include "forces.cpp"
 
 
 using namespace std;
@@ -43,6 +44,10 @@ int main() {
    if (config.spatial_distribution_projection) {
       spatial_distribution_projection(&v, &config);
    }
+   if (config.forces) {
+      force_projections(&v, &config);
+   }
+
 
    config.script_wrapper.close();
    return 0;

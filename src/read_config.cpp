@@ -55,8 +55,12 @@ void parse_inputfile(Configuration& config, const Node& node) {
       config.liquid_atoms = str2vec(config.tempstr);
    parse(plots, "nbins_x", config.nbins_x);
    parse(plots, "nbins_y", config.nbins_y);
-   
 
+   parse(plots, "forces", config.forces);
+   parse(plots, "forces_from_atom",config.forces_from_atom);
+   parse(plots, "forces_to_atoms", config.tempstr);
+      config.forces_to_atoms = str2vec(config.tempstr);
+   parse(plots, "forces_bins", config.forces_bins);
 
 }
 
