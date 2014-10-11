@@ -21,6 +21,11 @@ int main() {
    v.input_filename="vasprun.xml";
    readXML(&v);
 
+   //if (readXML(&v)==0)  {
+//      cout << "\nERROR READING XML FILE. EXITING\n";
+//      return 0;
+//   }
+
 
    if (config.msd) {
       mean_square_displacement(&v, &config);

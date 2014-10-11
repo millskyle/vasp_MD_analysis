@@ -84,7 +84,7 @@ int global_density(FileInfo *vasprun, Configuration *config) {
                   atomobject->mass *
                   converter.moles_per_gram )  << 
                "\t" << 
-               (  atomobject->atomspertype  / ((vasprun->latt[0][0]-1) * (vasprun->latt[1][1]-1) * (vasprun->latt[2][2]-1))
+               (  atomobject->atomspertype  / (vasprun->latt[0][0]*vasprun->latt[1][1]*vasprun->latt[2][2])
                   * pow(converter.angstroms_per_cm,3)
                   * atomobject->mass
                   * converter.moles_per_gram ) <<
