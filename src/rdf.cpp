@@ -11,8 +11,8 @@
 int radial_distribution_function(FileInfo *vasprun, Configuration *config) {
    if (!config->rdf) {cout << "\nRDF called but not requested in configuration. Exiting"; return 1;}
 
-   cout << "--- Starting Radial Distribution ---" <<endl;
-   cout << "RDF requested for " << config->rdf_atoms.size() << " atom types: " << vec2str(config->rdf_atoms) << endl;
+   screen.status << "Radial Distribution Function";
+   screen.step   << "RDF requested for " + vec2str(config->rdf_atoms);
    //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
    vasprun->unwrap(); 
    
@@ -35,7 +35,7 @@ int radial_distribution_function(FileInfo *vasprun, Configuration *config) {
    for (int atomname=0; atomname < config->msd_atoms.size(); atomname++) {
       //this pointer will point to the atomType object for this type of atom 
       atomType* atomobject = vasprun->GetAtom(config->msd_atoms[atomname]);
-      cout << "Beginning RDF calculation for " << atomobject->element << ".\n";   
+      screen.step << "Beginning RDF calculation for " + atomobject->element;
       
       double rdf_sum=0; //the aggregate sum of of the displacements in the  timestep
       double xdist; // distances that the atom moved in x,y,z

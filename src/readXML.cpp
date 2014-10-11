@@ -5,7 +5,9 @@
 #include "data_structure.h"
 #include "tinyxml/tinyxml.h"
 #include "tinyxml/tinystr.h"
+#include "screen.h"
 //#define TIXML_USE_STL
+
 using namespace std;
 
 typedef TiXmlElement tag;
@@ -55,12 +57,12 @@ int readXML(FileInfo *vasprun) {
    int timestep_counter = 0;
    TiXmlDocument doc;
 //   if (doc.LoadFile(info.input_filename.c_str())) {
-   cout << "Loading file into memory" << endl;
+   screen.status << "Loading file into memory" ;
    if (!doc.LoadFile(vasprun->input_filename.c_str())) {
       cerr << doc.ErrorDesc() << endl;
-      return 0;
+      return 1;
    }
-   cout << "File Loaded. Beginning to parse" <<endl;
+   screen.status << "File Loaded. Beginning to parse";
   
 
    for (tag* level1 = doc.FirstChildElement(); level1 != NULL; level1 = level1->NextSiblingElement()) {
@@ -151,48 +153,47 @@ int readXML(FileInfo *vasprun) {
    }
 
    vasprun->ntimesteps = vasprun->timesteps.size();
-   cout << "SYSTEM: " << vasprun->system_name << endl;
-   cout << "Number of atoms: " << vasprun->numatoms << endl;
-   cout << "Number of atom types: " << vasprun->numtypes << endl;
+
+   screen.data("SYSTEM", vasprun->system_name);
+   screen.data("NATOMS", vasprun->numatoms);
+   screen.data("NTYPES", vasprun->numtypes);
+   screen.data("NSTEPS", vasprun->ntimesteps);
+   screen.data("DT", to_string(vasprun->dt) + " femtosecond");
+   screen.data("REALTIME", to_string(vasprun->dt*vasprun->ntimesteps/1000.0) + " picoseconds") ;
+   screen.data("LATTICE DIMENSIONS","");
+   screen.data("   x",vasprun->latt[0][0]);
+   screen.data("   y",vasprun->latt[1][1]);
+   screen.data("   z",vasprun->latt[2][2]);
+
+
+   screen.data("ATOMS","");
    for (int i =0; i<vasprun->numtypes; i++) {
-      cout << "\tThere are " << vasprun->atoms[i].atomspertype << " " << vasprun->atoms[i].element << " atoms each with mass " 
-           << vasprun->atoms[i].mass << " and " << vasprun->atoms[i].valence 
-           << " valence electrons.\n\t\t--> The " << vasprun->atoms[i].pseudopotential << " pseudopotential was used."  << endl;
+      screen.data("   " + vasprun->atoms[i].element, "");
+      screen.data("      COUNT", vasprun->atoms[i].atomspertype);
+      screen.data("      MASS", vasprun->atoms[i].mass);
+      screen.data("      VALENCE",vasprun->atoms[i].valence );
+      screen.data("      PP", vasprun->atoms[i].pseudopotential);
    }
 
-   cout << "The x lattice vector is <" << vasprun->latt[0][0] << ", " << vasprun->latt[0][1] << ", " << vasprun->latt[0][2] << ">." <<endl;
-   cout << "The y lattice vector is <" << vasprun->latt[1][0] << ", " << vasprun->latt[1][1] << ", " << vasprun->latt[1][2] << ">." <<endl;
-   cout << "The z lattice vector is <" << vasprun->latt[2][0] << ", " << vasprun->latt[2][1] << ", " << vasprun->latt[2][2] << ">." <<endl;
-
-   //atomType* theatomIwant;
    int index_counter=0;
    for (unsigned  i=0; i < vasprun->atoms.size(); i++ ) {
       vasprun->atoms[i].sindex = index_counter;
       vasprun->atoms[i].eindex = index_counter + vasprun->atoms[i].atomspertype-1;
-      cout << "   Atom "<<i<<" will go from index "<<vasprun->atoms[i].sindex<<" to " << vasprun->atoms[i].eindex << "." <<endl;
       index_counter = vasprun->atoms[i].eindex+1;
    }
+   
+   screen.status << "Splitting up data by atom type";
+   vasprun->dataIntoAtoms();
 
-   int junk=vasprun->dataIntoAtoms();
-   atomType* theatomIwant = vasprun->GetAtom("Al");
-   cout << "I chose the " << theatomIwant->element << " atoms which starts at index " << theatomIwant->sindex << endl ;
-   cout << "  For the " << theatomIwant->element << " atoms, there are " << theatomIwant->timesteps.size()  << " timesteps with timestep 0 having " << theatomIwant->timesteps[0].ppp.size() << " ppp elements." << endl;
+   screen.status << "Unwrapping coordinates";
+   vasprun->unwrap();
+   screen.status << "Weighing the system";
+   vasprun->mass_system(); //"weigh" the system.
 
-
-
-   cout << "There are " << vasprun->ntimesteps << " timesteps in the file with dt=" << vasprun->dt << " for a total time of " << vasprun->dt*vasprun->ntimesteps/1000.0 << " picoseconds." << endl;
-   cout << "For timestep 0 (the first timestep):" <<endl;
-   cout << "\tThere are "<<vasprun->timesteps[0].ppp.size() << " position vectors." << endl;
-   cout << "\tThere are "<<vasprun->timesteps[0].fff.size() << " force vectors." << endl;
-   cout << "\tThe first x coordinate of the position vector of the first atom in this timestep is " << vasprun->timesteps[0].ppp[0][0] << "\n";
-
-
-vasprun->unwrap();
-vasprun->mass_system(); //"weigh" the system.
-
-for (int i=0; i<vasprun->atoms.size(); i++ ) {
-   vasprun->atoms[i].atomindex=i;
-}
+// Fill the atomindex variable with that atom types' index.
+   for (int i=0; i<vasprun->atoms.size(); i++ ) {
+      vasprun->atoms[i].atomindex=i;
+   }
 
 /* This section writes the unwrapped coordinates to a series of files for animated plotting to ensure proper wrapping */ 
 /*

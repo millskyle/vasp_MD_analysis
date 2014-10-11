@@ -5,6 +5,7 @@
 #include <vector>
 #include <string.h>
 #include <cmath>
+
 using namespace std;
 
 typedef vector<float> threevector;
@@ -93,7 +94,6 @@ struct FileInfo {
          }
       }
       for (unsigned i=0; i<atoms.size(); i++) {  // for each atom type
-         cout << "Unwrapping "<< atoms[i].element << " coordinates.\n";
          for (unsigned t=1; t < ntimesteps-1; t++) { //for each timestep
 //            cout << "t=" <<  t << "\n";
 //            atoms[i].timesteps[t].ppp_uw = atoms[i].timesteps[t].ppp;
@@ -129,7 +129,6 @@ struct FileInfo {
 
    int calculate_COM(atomType *atoms) {
       if (atoms->COM_already) {return 0;}
-      cout << "Calculating center of mass for " << atoms->element << ".\n"; 
       
       double atomTotalMass = atoms->mass * atoms->atomspertype;
       double COMx,COMy,COMz = 0;

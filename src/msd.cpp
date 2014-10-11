@@ -4,14 +4,15 @@
 #include "data_structure.h"
 #include "utility_functions.h"
 
+Conversions convert;
+
 int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
    if (!config->msd) {cout << "\nMSD called but not requested in configuration. Exiting"; return 1;}
-
-   cout << "--- Starting Mean-Squared Displacement ---" <<endl;
-   cout << "MSD requested for " << config->msd_atoms.size() << " atom types: " << vec2str(config->msd_atoms) << endl;
+   
+   screen.status << "Mean Squared Displacement";
+   screen.step << "Requested for " + to_string(config->msd_atoms.size())+ " atom types: " + vec2str(config->msd_atoms);
    //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
    vasprun->unwrap(); 
-   Conversions convert;
    
    //Make a gnuplot object.  It takes care of writing the data to a script.
    GnuPlotScript gnuplot ;
@@ -24,10 +25,9 @@ int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
       //this pointer will point to the atomType object for this type of atom 
       atomType* atomobject = vasprun->GetAtom(config->msd_atoms[atomname]);
       //Calculate the center of mass for this atom_type. It'll be stored in the object.
+      screen.step << "Calculating center of mass for " + atomobject->element;
       vasprun->calculate_COM(atomobject);
-      //Make a pointer to the center of mass vector so I don't have to type so much all the time.
-//    vector<threevector>& COM = vasprun->atoms[atomobject->atomindex].COM.COM_value;         
-      cout << "Beginning MSD calculation for " << atomobject->element << ".\n";   
+      screen.step << "Beginning MSD calculation for " + atomobject->element;
       int msd_count=0; //the integer number of data points that go into the aggregate sum
       double msd_sum=0; //the aggregate sum of of the displacements in the  timestep
       double xdist; // distances that the atom moved in x,y,z

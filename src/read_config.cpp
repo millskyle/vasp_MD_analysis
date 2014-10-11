@@ -64,6 +64,7 @@ void parse_inputfile(Configuration& config, const Node& node) {
 
 
 bool read_configfile(Configuration& config) {
+    screen.section << "Reading configuration file \"config.yaml\" ";
     fstream file("config.yaml", fstream::in);
     if (!file.is_open()) {
         return false;
@@ -72,6 +73,6 @@ bool read_configfile(Configuration& config) {
     Node root;
     parser.GetNextDocument(root);
     parse_inputfile(config, root);
-    cout << "Configuration file \"config.yaml\" read.\n\n";
+    screen.finished << "Configuration file \"config.yaml\" read.";
     return true;
 }

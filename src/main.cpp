@@ -1,32 +1,36 @@
 #include "readXML.cpp"
 #include "read_config.cpp"
 #include "utility_functions.h"
-
-
+#include "screen.h"
 #include "msd.cpp"
 #include "rdf.cpp"
 #include "rho.cpp"
 #include "spatial_dist.cpp"
 
+
 using namespace std;
+
+//extern ScreenOutput screen;
 
 
 int main() {
-   cout << "\n Starting XML read"<<endl;
+   cout << BOLDRED << "WELCOME!!!" << RESET << "\n";
    FileInfo v;
    Configuration config;
    read_configfile(config);
-   cout << "\n done"<<endl;
 
    v.input_filename="vasprun.xml";
-   readXML(&v);
 
-   //if (readXML(&v)==0)  {
-//      cout << "\nERROR READING XML FILE. EXITING\n";
-//      return 0;
-//   }
+   screen.section << "READING FILE";
+   if (readXML(&v)==1)  {
+      screen.error << "READING XML FILE FAILED. EXITING\n";
+      return 0;
+   } else {
+      screen.finished << "Successfully read XML file";
+   }
 
 
+   screen.section << "PLOTS";
    if (config.msd) {
       mean_square_displacement(&v, &config);
    }

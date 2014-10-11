@@ -6,7 +6,7 @@
 int spatial_distribution_projection(FileInfo *vasprun, Configuration *config) {
    if (!config->spatial_distribution_projection) {cout << "\nSpatial Distribution called but not requested in configuration. Exiting"; return 1;}
 
-   cout << "---Spatial Distribution ---" <<endl;
+   screen.status <<  "Spatial Distribution projected onto plane";
    
    //Start a simple bash script which calls GNUplot to plot the msd data
    GnuPlotScript gnuplot;
@@ -34,7 +34,7 @@ int spatial_distribution_projection(FileInfo *vasprun, Configuration *config) {
    }
     
  
-   cout << "Plotting spatial distribution heat map on axis " << dim1 << " vs. " << dim2 << ".\n";
+ screen.step << "Plotting spatial distribution heat map on axis " + to_string(dim1) + " vs. " + to_string(dim2);
 
   
    gnuplot.command("set xrange [0:" + to_string(vasprun->latt[dim1][dim1]) + "] ");
@@ -64,7 +64,7 @@ int spatial_distribution_projection(FileInfo *vasprun, Configuration *config) {
    for (int atomname=0; atomname < config->liquid_atoms.size(); atomname++) {
       //this pointer will point to the atomType object for this type of atom 
       atomType* atomobject = vasprun->GetAtom(config->msd_atoms[atomname]);
-      cout << "Starting to bin the " << atomobject->element << " atoms for spatial distribution.\n";   
+      screen.step << "Binning the " + atomobject->element + " atoms";   
       
       //for each timestep
       for (int t=0; t < atomobject->timesteps.size()-1; t++ ) {

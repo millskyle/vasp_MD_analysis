@@ -9,8 +9,8 @@ Conversions converter;
 int global_density(FileInfo *vasprun, Configuration *config) {
    if (!config->rho) {cout << "\nDensity function called but not requested in configuration. Exiting"; return 1;}
 
-   cout << "--- Starting Density calculations ---" <<endl;
-   cout << "Density plots requested for " << config->rho_atoms.size() << " atom types: " << vec2str(config->rho_atoms) << endl;
+   screen.status << "Density calculations" ;
+   screen.step << "Density plots requested for " + vec2str(config->rho_atoms);
   
   
    //Make a gnuplot object.  It takes care of writing the data to a script. 
@@ -24,7 +24,7 @@ int global_density(FileInfo *vasprun, Configuration *config) {
       //this pointer will point to the atomType object for this type of atom 
       atomType* atomobject = vasprun->GetAtom(config->rho_atoms[atomname]);
       
-      cout << "Beginning Density calculation for " << atomobject->element << ".\n";   
+      screen.step << "Beginning Density calculation for " + atomobject->element;   
       //for each timestep which we have positions for
       for (int t=1; t < atomobject->timesteps.size()-2; t++ ) {
          //for each atom in the position vector of vectors
