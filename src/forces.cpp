@@ -15,7 +15,10 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
    //Make a gnuplot object.  It takes care of writing the data to a script.
    GnuPlotScript gnuplot ;
    gnuplot.initialise("forces","Force","horizontal","vertical","force.pdf");
+   gnuplot.command("set yrange [-1:1]");
+   gnuplot.command("set xrange [0:]");
    gnuplot.command("plot ",false);
+
 
 
 
@@ -42,6 +45,7 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
             //for each atom of the second type
             for (int b=a+1; b<atomobject0->atomspertype-1; b++) {
                //vector between the two atoms
+               if (rand()%10==1) {
                dx = atomobject0->timesteps[t].ppp[b][0] - atomobject1->timesteps[t].ppp[a][0];
                dy = atomobject0->timesteps[t].ppp[b][1] - atomobject1->timesteps[t].ppp[a][1];
                dz = atomobject0->timesteps[t].ppp[b][2] - atomobject1->timesteps[t].ppp[a][2];
@@ -75,14 +79,14 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
                
                thisdata.clear();
                thisdata.push_back(distance);
-               thisdata.push_back(proj1);
+               thisdata.push_back(-proj1);
                all_data.push_back(thisdata);
                
                thisdata.clear();
                thisdata.push_back(distance);
-               thisdata.push_back(-proj0);
+               thisdata.push_back(proj0);
                all_data.push_back(thisdata);
-
+            }
 
             } 
          }
@@ -90,10 +94,15 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
    
    screen.step << "There are no atoms within less than " + to_string(min_distance) + " angstroms of each other.";
 
+//   ofstream ooo;
+//   ooo.open("output/all_force_points.data");
+
    //make vectors that are the correct size (ie: number of bins)
    vector<int> bins_count;
    vector<double> bins_sum;
+   vector<double> bins_std_dev;
    for (int i=0; i<config->forces_bins; i++) {
+      bins_std_dev.push_back(0);
       bins_count.push_back(0);
       bins_sum.push_back(0.0);
    }
@@ -101,11 +110,25 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
    double bin_width = max_distance / config->forces_bins;
 
    for (int i=0; i<all_data.size(); i++) { 
+      //ooo << all_data[i][0] << "\t" << all_data[i][1] << "\n";
       bins_count[floor(all_data[i][0] / bin_width)]++;
       bins_sum[floor(all_data[i][0] / bin_width)]+= all_data[i][1];
    }
 
+   int thisbin;
+   for (int i=0; i<all_data.size(); i++) {
+      thisbin = floor(all_data[i][0] / bin_width);
+      bins_std_dev[thisbin] += pow((all_data[i][1] - bins_sum[thisbin] / bins_count[thisbin]),2);
+   }
 
+   for (int i=0; i<bins_std_dev.size(); i++) {
+      bins_std_dev[i]/=bins_count[i];
+      bins_std_dev[i] = sqrt(bins_std_dev[i]);
+   }
+
+
+
+//   ooo.close();
 
    
    
@@ -113,20 +136,25 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
    //write out the data for this element to an element-specific file
    ofstream of;
    of.open("output/forces_" + atomobject1->element + ".data");     
+   
+   double std_dev=0.05;
        
    //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
-   gnuplot.command("'forces_" 
+   gnuplot.command(
+      "'forces_" 
       + atomobject1->element 
       + ".data' using 1:2 with lines title '" 
       + atomobject1->element 
       + "' ls "
       + gnuplot.style()
       + " lw 3 , "
+      + " 'forces_" + atomobject1->element + ".data' using 1:($2-$3) with lines ls " + gnuplot.style() + " lw 0.5, "
+      + " 'forces_" + atomobject1->element + ".data' using 1:($2+$3) with lines ls " + gnuplot.style() + " lw 0.5, "
       ,false);
 
    //write each timestep to a file
    for (int i=0; i < bins_sum.size(); i++) {
-         of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\n";
+         of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << bins_std_dev[i] << "\n";
         //cout << bins_sum[i] << " / " << bins_count[i] << " = " << bins_sum[i] / bins_count[i] << "\n";
    }
    of.close();
