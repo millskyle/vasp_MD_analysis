@@ -40,7 +40,7 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
          //for each atom in the position vector of vectors
          for (int a=0; a<atomobject1->atomspertype-1; a++) {
             //for each atom of the second type
-            for (int b=0; b<atomobject0->atomspertype-1; b++) {
+            for (int b=a+1; b<atomobject0->atomspertype-1; b++) {
                //vector between the two atoms
                dx = atomobject0->timesteps[t].ppp[b][0] - atomobject1->timesteps[t].ppp[a][0];
                dy = atomobject0->timesteps[t].ppp[b][1] - atomobject1->timesteps[t].ppp[a][1];
@@ -55,9 +55,10 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
                if (distance < min_distance) { min_distance = distance; }
 
                //get the unit vector by dividing by magnitude
-               dx = dx/(distance);
-               dy = dy/(distance);
-               dz = dz/(distance);
+               // dx = dx/(distance);
+               // dy = dy/(distance);
+               // dz = dz/(distance);
+
                //get the forces
                fx0 = atomobject0->timesteps[t].fff[b][0];
                fy0 = atomobject0->timesteps[t].fff[b][1];
@@ -67,8 +68,8 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
                fy1 = atomobject1->timesteps[t].fff[a][1];
                fz1 = atomobject1->timesteps[t].fff[a][2];
                //project it
-               proj0 = fx0*dx + fy0*dy + fz0*dz;
-               proj1 = fx1*dx + fy1*dy + fz1*dz;
+               proj0 = (fx0*dx + fy0*dy + fz0*dz)/distance;
+               proj1 = (fx1*dx + fy1*dy + fz1*dz)/distance;
               
 //               if (distance > 6.0) { proj1=0; proj0=0;  }
                
