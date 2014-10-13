@@ -4,11 +4,10 @@
 #include "data_structure.h"
 #include "utility_functions.h"
 
-int force_projections(FileInfo *vasprun, Configuration *config) {
-   if (!config->forces) {cout << "\nForce projection called but not requested in configuration. Exiting"; return 1;}
-   
+int force_bond_projections(FileInfo *vasprun, Configuration *config) {
+   if (!config->forces) {cout << "\nForce projection called but not requested in configuration. Exiting"; return 1;}   
    screen.status << "Force Projections";
-   screen.step << "Force projections requested from " + config->forces_from_atom + " atoms to " + vec2str(config->msd_atoms) + " atoms ";
+   screen.step << "Bond force projections requested from " + config->forces_from_atom + " atoms to " + vec2str(config->msd_atoms) + " atoms ";
    //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
    vasprun->unwrap(); 
    
@@ -19,14 +18,11 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
    gnuplot.command("set xrange [0:]");
    gnuplot.command("plot ",false);
 
-
-
-
+   //first atom_type object
    atomType* atomobject0 = vasprun->GetAtom(config->forces_from_atom);
-
    
-   double dx,dy,dz,fx0,fy0,fz0, fx1,fy1,fz1; //components of the vector between atoms
-   double proj0, proj1;
+   double dx,dy,dz,fx0,fy0,fz0,fx1,fy1,fz1; //components of the vectors between atoms
+   double proj0, proj1; //scalar projections
    double distance, total_proj;
    vector<vector<double>> all_data;
    vector<double> thisdata;
@@ -38,66 +34,57 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
       //this pointer will point to the atomType object for this type of atom 
       atomType* atomobject1 = vasprun->GetAtom(config->forces_to_atoms[atomname]);
       screen.step << "Beginning force calculation for " + atomobject0->element + " to " + atomobject1->element;
-      //for each timestep which we have positions for
+      //for each valid timestep
       for (int t=0; t < atomobject1->timesteps.size()-2; t++ ) {
          //for each atom in the position vector of vectors
          for (int a=0; a<atomobject1->atomspertype-1; a++) {
             //for each atom of the second type
-            for (int b=a+1; b<atomobject0->atomspertype-1; b++) {
+            for (int b=0; b<atomobject0->atomspertype-1; b++) {
                //vector between the two atoms
-               if (rand()%10==1) {
-               dx = atomobject0->timesteps[t].ppp[b][0] - atomobject1->timesteps[t].ppp[a][0];
-               dy = atomobject0->timesteps[t].ppp[b][1] - atomobject1->timesteps[t].ppp[a][1];
-               dz = atomobject0->timesteps[t].ppp[b][2] - atomobject1->timesteps[t].ppp[a][2];
-               //minimum image correction:
-               dx = dx - nint(dx / vasprun->latt[0][0])*vasprun->latt[0][0];
-               dy = dy - nint(dy / vasprun->latt[1][1])*vasprun->latt[1][1];
-               dz = dz - nint(dz / vasprun->latt[2][2])*vasprun->latt[2][2];
+               if (rand()%10==1) {  //only actually calculate 10% of the force projections. (for speed).
+                  dx = atomobject0->timesteps[t].ppp[b][0] - atomobject1->timesteps[t].ppp[a][0];
+                  dy = atomobject0->timesteps[t].ppp[b][1] - atomobject1->timesteps[t].ppp[a][1];
+                  dz = atomobject0->timesteps[t].ppp[b][2] - atomobject1->timesteps[t].ppp[a][2];
+                  //minimum image correction:
+                  dx = dx - nint(dx / vasprun->latt[0][0])*vasprun->latt[0][0];
+                  dy = dy - nint(dy / vasprun->latt[1][1])*vasprun->latt[1][1];
+                  dz = dz - nint(dz / vasprun->latt[2][2])*vasprun->latt[2][2];
+                  //distance between both atoms:
+                  distance = sqrt(dx*dx + dy*dy + dz*dz);
+                  if (distance > max_distance) { max_distance = distance; }
+                  if (distance < min_distance) { min_distance = distance; }
 
-               distance = sqrt(dx*dx + dy*dy + dz*dz);
-               if (distance > max_distance) { max_distance = distance; }
-               if (distance < min_distance) { min_distance = distance; }
-
-               //get the unit vector by dividing by magnitude
-               // dx = dx/(distance);
-               // dy = dy/(distance);
-               // dz = dz/(distance);
-
-               //get the forces
-               fx0 = atomobject0->timesteps[t].fff[b][0];
-               fy0 = atomobject0->timesteps[t].fff[b][1];
-               fz0 = atomobject0->timesteps[t].fff[b][2];
-
-               fx1 = atomobject1->timesteps[t].fff[a][0];
-               fy1 = atomobject1->timesteps[t].fff[a][1];
-               fz1 = atomobject1->timesteps[t].fff[a][2];
-               //project it
-               proj0 = (fx0*dx + fy0*dy + fz0*dz)/distance;
-               proj1 = (fx1*dx + fy1*dy + fz1*dz)/distance;
-              
-//               if (distance > 6.0) { proj1=0; proj0=0;  }
-               
-               thisdata.clear();
-               thisdata.push_back(distance);
-               thisdata.push_back(-proj1);
-               all_data.push_back(thisdata);
-               
-               thisdata.clear();
-               thisdata.push_back(distance);
-               thisdata.push_back(proj0);
-               all_data.push_back(thisdata);
-            }
-
+                  //get the forces from the atom objects
+                  fx0 = atomobject0->timesteps[t].fff[b][0];
+                  fy0 = atomobject0->timesteps[t].fff[b][1];
+                  fz0 = atomobject0->timesteps[t].fff[b][2];
+                  fx1 = atomobject1->timesteps[t].fff[a][0];
+                  fy1 = atomobject1->timesteps[t].fff[a][1];
+                  fz1 = atomobject1->timesteps[t].fff[a][2];
+                  //project them
+                  // (F dot r) / |r|
+                  proj0 = (fx0*dx + fy0*dy + fz0*dz)/distance;
+                  proj1 = (fx1*dx + fy1*dy + fz1*dz)/distance;
+                 
+                  //push the first projection into the all_data vector
+                  thisdata.clear();
+                  thisdata.push_back(distance);
+                  //one projection has to be negative because dx,dy,dz vector is in wrong direction for it. 
+                  thisdata.push_back(-proj1);
+                  all_data.push_back(thisdata);
+                  
+                  //push the second projection
+                  thisdata.clear();
+                  thisdata.push_back(distance);
+                  thisdata.push_back(proj0);
+                  all_data.push_back(thisdata);
+               } //endif
             } 
          }
       }
    
-   screen.step << "There are no atoms within less than " + to_string(min_distance) + " angstroms of each other.";
-
-//   ofstream ooo;
-//   ooo.open("output/all_force_points.data");
-
    //make vectors that are the correct size (ie: number of bins)
+   //to hold the data
    vector<int> bins_count;
    vector<double> bins_sum;
    vector<double> bins_std_dev;
@@ -106,40 +93,32 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
       bins_count.push_back(0);
       bins_sum.push_back(0.0);
    }
-   
+  
+   //calculate the width of each bin 
    double bin_width = max_distance / config->forces_bins;
 
+   //for each data point, put it in the correct bin and increment the bin counter
    for (int i=0; i<all_data.size(); i++) { 
-      //ooo << all_data[i][0] << "\t" << all_data[i][1] << "\n";
       bins_count[floor(all_data[i][0] / bin_width)]++;
       bins_sum[floor(all_data[i][0] / bin_width)]+= all_data[i][1];
    }
 
+   //calculate the standard deviation for each bin
    int thisbin;
    for (int i=0; i<all_data.size(); i++) {
       thisbin = floor(all_data[i][0] / bin_width);
-      bins_std_dev[thisbin] += pow((all_data[i][1] - bins_sum[thisbin] / bins_count[thisbin]),2);
+      bins_std_dev[thisbin] += pow((all_data[i][1] - (bins_sum[thisbin] / bins_count[thisbin])),2);
    }
 
+   //normalize/sqrt the standard deviation
    for (int i=0; i<bins_std_dev.size(); i++) {
-      bins_std_dev[i]/=bins_count[i];
+      bins_std_dev[i]=bins_std_dev[i] / bins_count[i];
       bins_std_dev[i] = sqrt(bins_std_dev[i]);
    }
 
 
-
-//   ooo.close();
-
    
-   
-   
-   //write out the data for this element to an element-specific file
-   ofstream of;
-   of.open("output/forces_" + atomobject1->element + ".data");     
-   
-   double std_dev=0.05;
-       
-   //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
+   //write out the gnuplot command
    gnuplot.command(
       "'forces_" 
       + atomobject1->element 
@@ -148,14 +127,25 @@ int force_projections(FileInfo *vasprun, Configuration *config) {
       + "' ls "
       + gnuplot.style()
       + " lw 3 , "
-      + " 'forces_" + atomobject1->element + ".data' using 1:($2-$3) with lines ls " + gnuplot.style() + " lw 0.5, "
-      + " 'forces_" + atomobject1->element + ".data' using 1:($2+$3) with lines ls " + gnuplot.style() + " lw 0.5, "
+      + " 'forces_" 
+      + atomobject1->element 
+      + ".data' using 1:($2-$3) with lines ls " 
+      + gnuplot.style() 
+      + " lw 0.5, "
+      + " 'forces_" 
+      + atomobject1->element 
+      + ".data' using 1:($2+$3) with lines ls " 
+      + gnuplot.style() 
+      + " lw 0.5, "
       ,false);
 
-   //write each timestep to a file
+   
+   
+   //write out the data for this element to an element-specific file
+   ofstream of;
+   of.open("output/forces_" + atomobject1->element + ".data");     
    for (int i=0; i < bins_sum.size(); i++) {
-         of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << bins_std_dev[i] << "\n";
-        //cout << bins_sum[i] << " / " << bins_count[i] << " = " << bins_sum[i] / bins_count[i] << "\n";
+      of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << bins_std_dev[i] << "\n";
    }
    of.close();
 
