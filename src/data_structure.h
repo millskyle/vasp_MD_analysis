@@ -211,8 +211,8 @@ struct Configuration {
    string forces_from_atom;
    vector<string> forces_to_atoms;
    int forces_bins;
-
-
+   vector<string> force_field_atoms;
+   int force_field_resolution;
 
    ofstream script_wrapper;
    string script_wrapper_location = "output/make_all_plots.sh";

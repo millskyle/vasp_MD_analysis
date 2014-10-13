@@ -4,6 +4,197 @@
 #include "data_structure.h"
 #include "utility_functions.h"
 
+int force_field(FileInfo *vasprun, Configuration *config) {
+   if (!config->forces) {cout << "\nForce projection called but not requested in configuration. Exiting"; return 1;}   
+   screen.status << "Force-field calculations";
+   screen.step << "force field requested for " + vec2str(config->force_field_atoms) + " atoms";
+   //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
+   
+   //Make a gnuplot object.  It takes care of writing the data to a script.
+   GnuPlotScript gnuplot ;
+   gnuplot.initialise("forcefield","Force","horizontal","vertical","forcefield.pdf");
+   gnuplot.command("set yrange [0:" + to_string(vasprun->latt[2][2]) + "]");
+   gnuplot.command("set xrange [0:" + to_string(vasprun->latt[1][1]) + "]");
+   gnuplot.command("plot ",false);
+
+   double dx,dy,dz,fx,fy,fz; //components of the vectors between atoms
+   vector<vector<double>> all_data;
+   vector<double> thisdata;
+   double max_distance=0;
+   double min_distance=100000000;
+   
+   vector<double> bin_width;
+   bin_width.push_back(vasprun->latt[1][1] / config->force_field_resolution);
+   bin_width.push_back(vasprun->latt[2][2] / config->force_field_resolution);
+   
+   vector<vector<vector<double>>> alldata;
+
+   vector<double> onebin;
+   onebin.push_back(0.0);
+   onebin.push_back(0.0);
+   onebin.push_back(0.0);
+   onebin.push_back(0.0);
+   onebin.push_back(0.0);
+
+   vector<vector<double>> onerow;
+
+   //make a "row vector" by pushing n bins into a vector
+   for (int i=0; i<config->force_field_resolution; i++) {
+      onerow.push_back(onebin);
+   }
+   //push N rows into the alldata vector
+   for (int j=0; j<config->force_field_resolution; j++) {
+      alldata.push_back(onerow);
+   }
+
+   //fill the first two elements of every bin with the y and z coordinates of the centre of that bin
+   for (int i=0; i<config->force_field_resolution; i++) {
+      for (int j=0; j< config->force_field_resolution; j++) {
+         alldata[i][j][0] = i*bin_width[0] + 0.5*bin_width[0];
+         alldata[i][j][1] = j*bin_width[1] + 0.5*bin_width[1];
+      }
+   }
+
+
+   int thisbiny;
+   int thisbinz;
+
+   //For each atom in the requested atom types
+   for (int atomname=0; atomname < config->force_field_atoms.size(); atomname++) {
+      //this pointer will point to the atomType object for this type of atom 
+      atomType* atomobject = vasprun->GetAtom(config->force_field_atoms[atomname]);
+      screen.step << "Beginning force field calculation for " + atomobject->element; 
+      //for each valid timestep
+      for (int t=0; t < atomobject->timesteps.size()-2; t++ ) {
+         //for each atom in the position vector of vectors
+         for (int a=0; a<atomobject->atomspertype-1; a++) {
+            //for each atom of the second type
+
+                  //get the forces from the atom objects
+                  fy = atomobject->timesteps[t].fff[a][1];
+                  fz = atomobject->timesteps[t].fff[a][2];
+                  
+                  thisbiny = floor(atomobject->timesteps[t].ppp[a][1] / bin_width[0]);
+                  thisbinz = floor(atomobject->timesteps[t].ppp[a][2] / bin_width[1]);
+
+                  alldata[thisbiny][thisbinz][4]++;
+                  alldata[thisbiny][thisbinz][2]+=fy;
+                  alldata[thisbiny][thisbinz][3]+=fz;
+
+         } 
+      }
+   
+
+
+   
+   //write out the gnuplot command
+   gnuplot.command(
+      "'force_field_" 
+      + atomobject->element 
+      + ".data' using 1:2:3:4 with vectors head filled title '" 
+      + atomobject->element 
+      + "' "
+      ,false);
+
+   
+   double norm;
+   //write out the data for this element to an element-specific file
+   ofstream of;
+   of.open("output/force_field_" + atomobject->element + ".data");     
+   for (int i=0; i<config->force_field_resolution; i++) {
+      for (int j=0; j< config->force_field_resolution; j++) {
+         //norm=  sqrt(x**2 + y**2) * count
+         norm = sqrt(alldata[i][j][2]*alldata[i][j][2] + alldata[i][j][3]*alldata[i][j][3])  ;
+         if (norm==0) {
+            norm=0.0000001;
+         }
+         of << alldata[i][j][0] 
+            << "\t" 
+            << alldata[i][j][1] 
+            << "\t" 
+            << bin_width[0]*alldata[i][j][2]/(4*norm)
+            << "\t"
+            << bin_width[0]*alldata[i][j][3]/(4*norm)
+            <<"\n";
+      }
+   }
+//for (int i=0; i < bins_sum.size(); i++) {
+//      of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << bins_std_dev[i] << "\n";
+//   }
+   of.close();
+
+   
+}
+
+   gnuplot.close();
+   //add a command to the global plot script to make the msd plots
+   config->script_wrapper << "\ngnuplot plot_forcefield.gnu \n" ;   
+
+   return 0;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    if (!config->forces) {cout << "\nForce projection called but not requested in configuration. Exiting"; return 1;}   
    screen.status << "Force Projections";

@@ -61,7 +61,9 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "forces_to_atoms", config.tempstr);
       config.forces_to_atoms = str2vec(config.tempstr);
    parse(plots, "forces_bins", config.forces_bins);
-
+   parse(plots, "force_field_atoms", config.tempstr);
+      config.force_field_atoms = str2vec(config.tempstr);
+   parse(plots, "force_field_resolution", config.force_field_resolution);
 }
 
 

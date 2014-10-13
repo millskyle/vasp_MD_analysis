@@ -35,10 +35,8 @@ plots:
   forces_to_atoms: 'Al'
   forces_bins: 250
 
-
-
-
-
+  force_field_atoms: 'Al'
+  force_field_resolution: 15
 
 
 
