@@ -82,15 +82,28 @@ int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
       + "' ls "
       + gnuplot.style()
       + " lw 3 ,"
+      + " '"
+      + config->msd_data_prefix
+      + atomobject->element
+      + ".data' using ($0*"
+      + to_string(vasprun->dt)
+      + "*0.001):3 with lines title '"
+      + "Theoretical"
+      + "' ls "
+      + gnuplot.style()
+      + " lw 3 ,"
       ,false);
 
-   double experiment_diffusion_coefficient = 7.8e-9; //in m^2/s 
+   double experiment_diffusion_coefficient_min = 4e-9; //in m^2/s 
+   double experiment_diffusion_coefficient_max = 7e-9;
    //write each timestep to a file
    for (int t=0; t < atomobject->timesteps.size(); t++) {
       if (atomobject->timesteps[t].MSD>=0) {
          of << atomobject->timesteps[t].MSD 
             << "\t" 
-            << 6*experiment_diffusion_coefficient * (t*vasprun->dt*convert.femto2pico)   * ( convert.m2A * convert.m2A / convert.to_pico   )
+            << 6*experiment_diffusion_coefficient_min * (t*vasprun->dt*convert.femto2pico)   * ( convert.m2A * convert.m2A / convert.to_pico   )
+            << "\t"
+            << 6*experiment_diffusion_coefficient_max * (t*vasprun->dt*convert.femto2pico)   * ( convert.m2A * convert.m2A / convert.to_pico   )
             << "\n" ;
 //         cout << atomobject->timesteps[t].MSD << "\n" ;
       }
