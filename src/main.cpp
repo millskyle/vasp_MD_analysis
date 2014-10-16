@@ -46,7 +46,7 @@ int main() {
    }
    if (config.forces) {
       force_field(&v, &config);
-//      force_bond_projections(&v, &config);
+      force_bond_projections(&v, &config);
    }
 
 
