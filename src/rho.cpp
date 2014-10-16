@@ -25,14 +25,20 @@ int global_density(FileInfo *vasprun, Configuration *config) {
       atomType* atomobject = vasprun->GetAtom(config->rho_atoms[atomname]);
       
       screen.step << "Beginning Density calculation for " + atomobject->element;   
+      double x0,y0,z0;
+      double x1,y1,z1;
       //for each timestep which we have positions for
       for (int t=1; t < atomobject->timesteps.size()-2; t++ ) {
          //for each atom in the position vector of vectors
 
          vector<threevector>* positions= &atomobject->timesteps[t].ppp;
          
-         double x0,y0,z0 = 1000000000;
-         double x1,y1,z1 = -1000000000;
+         x0 = 100000;
+         y0 = 100000; 
+         z0 = 100000;
+         x1 = -100000; 
+         y1 = -100000; 
+         z1 = -100000;
          for (int a=0; a<positions->size(); a++) {
             if ((*positions)[a][0] < x0) { x0 = (*positions)[a][0]; }
             if ((*positions)[a][0] > x1) { x1 = (*positions)[a][0]; }
@@ -41,9 +47,10 @@ int global_density(FileInfo *vasprun, Configuration *config) {
             if ((*positions)[a][2] < z0) { z0 = (*positions)[a][2]; }
             if ((*positions)[a][2] > z1) { z1 = (*positions)[a][2]; }         
          }
-
-         int atomcount = count_atoms_in_box(*positions, x0, x1, y0, y1, z0, z1);
-         atomobject->timesteps[t].density = atomcount / ((x1-x0)*(y1-y0)*(z1-z0));   
+         
+//         int atomcount = count_atoms_in_box(*positions, x0, x1, y0, y1, z0, z1);
+         int atomcount = atomobject->atomspertype;
+         atomobject->timesteps[t].density = atomcount / ((x1-x0)*(y1-y0)*(z1-z0));
       }
 
    //write out the data for this element to an element-specific file
