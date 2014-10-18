@@ -57,7 +57,7 @@ struct FileInfo {
          vector<TimeStep> alltimes;
          for (unsigned t=0;t<ntimesteps-1; t++) {
             TimeStep ts;
-            for (unsigned a=atoms[i].sindex;a<atoms[i].eindex; a++) {
+            for (unsigned a=atoms[i].sindex;a<=atoms[i].eindex; a++) {
                ts.ppp.push_back(timesteps[t].ppp[a] ) ;
                ts.fff.push_back(timesteps[t].fff[a] ) ;
             }
