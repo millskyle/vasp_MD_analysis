@@ -227,7 +227,7 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
       screen.step << "Beginning force calculation for " + atomobject0->element + " to " + atomobject1->element;
       //for each valid timestep
       for (int t=0; t < atomobject1->timesteps.size()-2; t++ ) {
-         cout << "t=" << t << "\n";
+//         cout << "t=" << t << "\n";
          //for each atom in the position vector of vectors
          for (int a=0; a<atomobject1->atomspertype; a++) {
             //for each atom of the second type
@@ -254,16 +254,16 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
                   fy1 = atomobject1->timesteps[t].fff[a][1];
                   fz1 = atomobject1->timesteps[t].fff[a][2];
                  
-                  cout << "forces:  atom1: " << fx0 << "," << fy0 << "," << fz0 << ".\n" ; 
-                  cout << "forces:  atom2: " << fx1 << "," << fy1 << "," << fz1 << ".\n" ; 
+         //         cout << "forces:  atom1: " << fx0 << "," << fy0 << "," << fz0 << ".\n" ; 
+           //       cout << "forces:  atom2: " << fx1 << "," << fy1 << "," << fz1 << ".\n" ; 
 
                   //project them
                   // (F dot r) / |r|
                   proj0 = (fx0*dx + fy0*dy + fz0*dz)/distance;
                   proj1 = (fx1*dx + fy1*dy + fz1*dz)/distance;
 
-                  cout << "Projection: atom1 onto r: " << proj0 << "\n";
-                  cout << "Projection: atom2 onto r: " << proj1 << "\n";
+         //         cout << "Projection: atom1 onto r: " << proj0 << "\n";
+         //         cout << "Projection: atom2 onto r: " << proj1 << "\n";
                    
                   //push the first projection into the all_data vector
                   thisdata.clear();
@@ -298,7 +298,7 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
 
    //for each data point, put it in the correct bin and increment the bin counter
    for (int i=0; i<all_data.size(); i++) { 
-      cout << "distance=" << all_data[i][0] << " and force=" << all_data[i][1] << "\n";
+      //cout << "distance=" << all_data[i][0] << " and force=" << all_data[i][1] << "\n";
       bins_count[floor(all_data[i][0] / bin_width)]++;
       bins_sum[floor(all_data[i][0] / bin_width)]+= all_data[i][1];
    }
@@ -339,14 +339,23 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
       + " lw 0.5, "
       ,false);
 
-   
+   float smallest_dimension;
+   smallest_dimension = vasprun->latt[0][0];
+   if (vasprun->latt[1][1] < smallest_dimension) {
+      smallest_dimension = vasprun->latt[1][1];
+   }
+   if (vasprun->latt[2][2] < smallest_dimension) {
+      smallest_dimension = vasprun->latt[2][2];
+   }
    
    //write out the data for this element to an element-specific file
    ofstream of;
    of.open("output/forces_" + atomobject1->element + ".data");     
    for (int i=0; i <= bins_sum.size(); i++) {
       if (bins_count[i]>0) {
-         of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << bins_std_dev[i] << "\n";
+         if (i*bin_width < smallest_dimension/2.0) {
+            of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << bins_std_dev[i] << "\n";
+         }
       }
    }
    of.close();

@@ -4,12 +4,12 @@ files:
 
 
 plots:
-  msd: True
+  msd: False
   msd_data_prefix: "msd_"
   msd_atoms: 'Al   '
 
 
-  rdf: True
+  rdf: False
   rdf_data_prefix: "rdf_"
   rdf_atoms: 'Al '
   rdf_bins: 500
@@ -17,13 +17,13 @@ plots:
   rdf_plot_type: "lines"
 
   #Global density plots (density of the entire region occupied by rho_atoms
-  rho: True
+  rho: False
   rho_data_prefix: "rho_"
   rho_atoms: 'Al'
 
 
-  spatial_distribution_projection: True
-  spatial_distribution_lattice: True
+  spatial_distribution_projection: False
+  spatial_distribution_lattice: False
   collapse_dimension: 2
   lattice_atoms: ' '
   liquid_atoms: 'Al'
