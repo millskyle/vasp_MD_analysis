@@ -10,6 +10,18 @@ using namespace std;
 
 typedef vector<float> threevector;
 
+
+struct key {
+   string name;
+   string value;
+};
+
+
+
+struct INCAR {
+   vector<key> keys;
+};
+
 struct TimeStep {
    vector<threevector> ppp;
    vector<threevector> ppp_uw; //unwrapped
@@ -40,6 +52,7 @@ struct atomType {
 struct FileInfo {
    //File input/output parameters
    string input_filename,output_data_location,system_name;
+   INCAR incar;
    //File data structures
    int numatoms,numtypes,ntimesteps;
    bool unwrapped_already=false;

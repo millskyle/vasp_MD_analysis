@@ -5,10 +5,12 @@
 #include "data_structure.h"
 #include "tinyxml/tinyxml.h"
 #include "tinyxml/tinystr.h"
+#include "pugixml.hpp"
 #include "screen.h"
 //#define TIXML_USE_STL
 
 using namespace std;
+using namespace pugi;
 
 typedef TiXmlElement tag;
 int str2int(string ss){
@@ -54,7 +56,26 @@ bool update_3d_vector(vector<threevector>* objectToUpdate, float x, float y, flo
 
 //int readXML(FileInfo& info) {
 int readXML(FileInfo *vasprun) {
+   
+   /*redo this with pugixml cause it's way easier*/
+
+   xml_document vdoc;
+   screen.status << "Loading file into memory";
+   xml_parse_result result = vdoc.load_file(vasprun->input_filename.c_str() );
+   if (result) {
+      screen.status << "File loaded";
+   } else {
+      screen.error << "WARNING: Parsed with errors.";
+      screen.error << result.description();
+   }
+   
+   
+   
+   screen.status << "Beginning to parse"   ;
+
    int timestep_counter = 0;
+   
+   
    TiXmlDocument doc;
 //   if (doc.LoadFile(info.input_filename.c_str())) {
    screen.status << "Loading file into memory" ;
@@ -63,7 +84,34 @@ int readXML(FileInfo *vasprun) {
       return 1;
    }
    screen.status << "File Loaded. Beginning to parse";
+   
+   xml_node incar = vdoc.child("modeling").child("incar");
+   key thisKey;
+   for (xml_node i = incar.child("i"); i; i=i.next_sibling("i")) {
+      thisKey.name = i.attribute("name").value();
+      thisKey.value = i.child_value(); 
+      vasprun->incar.keys.push_back(thisKey);
+
+      /*copy some parameters into special objects*/
+      if (0==strcmp("POTIM",thisKey.name.c_str())) {
+         vasprun->dt = stod(thisKey.value);
+      } else if (0==strcmp("SYSTEM",thisKey.name.c_str())) {
+         vasprun->system_name = thisKey.value;
+      } else if (0==strcmp("TEBEG",thisKey.name.c_str())) {
+         vasprun->starting_temperature = stod(thisKey.value);
+      }
+   }
+   
+
+
+   xml_node atominfo = vdoc.child("modeling").child("atominfo");
+   vasprun->numatoms = str2int(atominfo.child("atoms").value()); 
+   vasprun->numtypes = str2int(atominfo.child("types").value());
   
+  xpath_node_set atomsobject = atominfo.select_nodes("//array[@name='atoms']");
+
+   
+
 
    for (tag* level1 = doc.FirstChildElement(); level1 != NULL; level1 = level1->NextSiblingElement()) {
       if (0==strcmp(level1->Value(),"modeling")) {
