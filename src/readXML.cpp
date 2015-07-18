@@ -85,9 +85,9 @@ int readXML(FileInfo *vasprun) {
    }
    screen.status << "File Loaded. Beginning to parse";
    
-   xml_node incar = vdoc.child("modeling").child("incar");
+   xml_node n_incar = vdoc.child("modeling").child("incar");
    key thisKey;
-   for (xml_node i = incar.child("i"); i; i=i.next_sibling("i")) {
+   for (xml_node i = n_incar.child("i"); i; i=i.next_sibling("i")) {
       thisKey.name = i.attribute("name").value();
       thisKey.value = i.child_value(); 
       vasprun->incar.keys.push_back(thisKey);
@@ -104,11 +104,40 @@ int readXML(FileInfo *vasprun) {
    
 
 
-   xml_node atominfo = vdoc.child("modeling").child("atominfo");
-   vasprun->numatoms = str2int(atominfo.child("atoms").value()); 
-   vasprun->numtypes = str2int(atominfo.child("types").value());
-  
-  xpath_node_set atomsobject = atominfo.select_nodes("//array[@name='atoms']");
+   xml_node n_atominfo = vdoc.child("modeling").child("atominfo");
+   vasprun->numatoms = str2int(n_atominfo.child("atoms").value()); 
+   vasprun->numtypes = str2int(n_atominfo.child("types").value());
+
+   //<array name="atomtypes">  
+   xpath_node_set ns_atomtypes = vdoc.select_nodes("//atominfo/array[@name='atomtypes']/set/rc");
+   
+   for (xpath_node_set::const_iterator it = ns_atomtypes.begin(); it != ns_atomtypes.end(); ++it) {
+      xpath_node_set ns_c = (*it).node().select_nodes("//c");
+      for (xpath_node_set::const_iterator it2 = ns_c.begin(); it2 != ns_c.end(); ++it2) {
+         cout << (*it2).node().child_value() << endl;
+      }
+   }  
+/*
+   
+atomType atomTypeData
+                  
+                  atomTypeData.atomspertype = str2int(c->FirstChild()->ToText()->Value());
+                  atomTypeData.element = c->FirstChild()->ToText()->Value();
+                  atomTypeData.mass = stod(c->FirstChild()->ToText()->Value());
+                  atomTypeData.valence = stod(c->FirstChild()->ToText()->Value());
+                  atomTypeData.pseudopotential = c->FirstChild()->ToText()->Value();
+
+                  */
+
+//   xpath_node atomtypes = atomsobject[0].node();
+
+
+//iterate over <array name="atoms"> tags (SHOULD ONLY BE ONE)
+/*   for (xpath_node_set::const_iterator it = atomsobject.begin(); it != atomsobject.end(); ++it) {
+      xpath_node node = *it;
+      cout << node.node().attribute("name").value() << endl;
+   }  */
+
 
    
 
