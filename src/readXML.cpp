@@ -10,7 +10,7 @@
 using namespace std;
 using namespace pugi;
 
-typedef TiXmlElement tag;
+//typedef TiXmlElement tag;
 int str2int(string ss){
    stringstream strValue;
    strValue << ss;
