@@ -3,8 +3,6 @@
 #include <iostream>
 #include <stdio.h>
 #include "data_structure.h"
-#include "tinyxml/tinyxml.h"
-#include "tinyxml/tinystr.h"
 #include "pugixml.hpp"
 #include "screen.h"
 //#define TIXML_USE_STL
