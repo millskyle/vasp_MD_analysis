@@ -6,7 +6,7 @@
 
 int force_field(FileInfo *vasprun, Configuration *config) {
    if (!config->forces) {cout << "\nForce projection called but not requested in configuration. Exiting"; return 1;}   
-   screen.status << "Force-field calculations";
+/*   screen.status << "Force-field calculations";
    screen.step << "force field requested for " + vec2str(config->force_field_atoms) + " atoms";
    //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
    
@@ -130,60 +130,12 @@ int force_field(FileInfo *vasprun, Configuration *config) {
    //add a command to the global plot script to make the msd plots
    config->script_wrapper << "\ngnuplot plot_forcefield.gnu \n" ;   
 
+
+*/
+
    return 0;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
