@@ -60,9 +60,13 @@ int readXML(FileInfo *vasprun) {
    
    /*redo this with pugixml cause it's way easier*/
 
-   xml_document vdoc;
+   float x, y, z;
+   vector<float> r;
+
+
+   xml_document doc;
    screen.status << "Loading file into memory";
-   xml_parse_result result = vdoc.load_file(vasprun->input_filename.c_str() );
+   xml_parse_result result = doc.load_file(vasprun->input_filename.c_str() );
    if (result) {
       screen.status << "File loaded";
    } else {
@@ -70,13 +74,13 @@ int readXML(FileInfo *vasprun) {
       screen.error << result.description();
    }
    
-   
+  
    
    screen.status << "Beginning to parse"   ;
 
    int timestep_counter = 0;
    
-   
+  /* 
    TiXmlDocument doc;
 //   if (doc.LoadFile(info.input_filename.c_str())) {
    screen.status << "Loading file into memory" ;
@@ -85,8 +89,9 @@ int readXML(FileInfo *vasprun) {
       return 1;
    }
    screen.status << "File Loaded. Beginning to parse";
+   */
    
-   xml_node n_incar = vdoc.child("modeling").child("incar");
+   xml_node n_incar = doc.child("modeling").child("incar");
    key thisKey;
    for (xml_node i = n_incar.child("i"); i; i=i.next_sibling("i")) {
       thisKey.name = i.attribute("name").value();
@@ -105,15 +110,18 @@ int readXML(FileInfo *vasprun) {
    
 
 
-   xml_node n_atominfo = vdoc.child("modeling").child("atominfo");
-   vasprun->numatoms = str2int(n_atominfo.child("atoms").value()); 
-   vasprun->numtypes = str2int(n_atominfo.child("types").value());
+   xml_node n_atominfo = doc.child("modeling").child("atominfo");
+   vasprun->numatoms = str2int(n_atominfo.child("atoms").child_value());
+   vasprun->numtypes = str2int(n_atominfo.child("types").child_value());
 
    //<array name="atomtypes">  
-   xpath_node_set ns_atomtypes = n_atominfo.select_nodes("//atominfo/array[@name='atomtypes']/set/rc");
+   //get the first <array> tag
+   xml_node n_temp = n_atominfo.select_nodes("//atominfo/array[@name='atomtypes']")[0].node() ;
+   //from the <array> tag, select .//set/rc
+   xpath_node_set ns_atomtypes = n_temp.select_nodes(".//set/rc");
    
 
-   //iterate over the <set><rc> values and put the contents (<c></c>) into objects
+   //iterate over each <rc> tag and and put the contents (<c></c>) into objects
    for (xpath_node_set::const_iterator it = ns_atomtypes.begin(); it != ns_atomtypes.end(); ++it) {
       xpath_node_set ns_c = it->node().select_nodes(".//c");
       atomType atomTypeData;
@@ -125,21 +133,55 @@ int readXML(FileInfo *vasprun) {
                                    .next_sibling().next_sibling().child_value() ); 
       atomTypeData.pseudopotential = it->node().child("c").next_sibling().next_sibling()\
                                    .next_sibling().next_sibling().child_value() ;
+//      cout << "TEST~" << endl;
       vasprun->atoms.push_back(atomTypeData);   
    }  
-/*
-   
-atomType atomTypeData
-                  
-                  atomTypeData.atomspertype = str2int(c->FirstChild()->ToText()->Value());
-                  atomTypeData.element = c->FirstChild()->ToText()->Value();
-                  atomTypeData.mass = stod(c->FirstChild()->ToText()->Value());
-                  atomTypeData.valence = stod(c->FirstChild()->ToText()->Value());
-                  atomTypeData.pseudopotential = c->FirstChild()->ToText()->Value();
 
-                  */
+   //Get the lattice vectors
+   n_temp = doc.select_nodes("//modeling/structure[@name='initialpos']/crystal/varray[@name='basis']")[0].node();
+   sscanf( n_temp.child("v").child_value() , "  %f  %f  %f " , &x, &y, &z );
+   update_3d_vector(&vasprun->latt, x,y,z);
+   sscanf( n_temp.child("v").next_sibling().child_value() , "  %f  %f  %f " , &x, &y, &z );
+   update_3d_vector(&vasprun->latt, x,y,z);
+   sscanf( n_temp.child("v").next_sibling().next_sibling().child_value() , "  %f  %f  %f " , &x, &y, &z );
+   update_3d_vector(&vasprun->latt, x,y,z);
 
-//   xpath_node atomtypes = atomsobject[0].node();
+
+   xpath_node_set ns_temp;
+
+   //Iterate over each timestep
+   xpath_node_set ns_timesteps = doc.select_nodes("//modeling/calculation");
+
+
+   //for each timestep
+   for (xpath_node_set::const_iterator it = ns_timesteps.begin(); it != ns_timesteps.end(); ++it) {
+      TimeStep thisStep;
+      ns_temp = it->node().select_nodes(".//structure/varray[@name='positions']");
+      if (ns_temp.size() > 0) {
+         n_temp = it->node().select_nodes(".//structure/varray[@name='positions']")[0].node();
+         for (xml_node thisNode = n_temp.child("v"); thisNode; thisNode = thisNode.next_sibling("v")) {
+            sscanf(thisNode.child_value(), "  %f  %f  %f ", &x, &y, &z );
+            vector<float> r;
+            r.push_back(x*vasprun->latt[0][0]);
+            r.push_back(y*vasprun->latt[1][1]);
+            r.push_back(z*vasprun->latt[2][2]);
+            thisStep.ppp.push_back(r);
+            }
+         n_temp = it->node().select_nodes(".//varray[@name='forces']")[0].node();
+         for (xml_node thisNode = n_temp.child("v"); thisNode; thisNode = thisNode.next_sibling("v")) {
+            sscanf(thisNode.child_value(), "  %f  %f  %f ", &x, &y, &z );
+            vector<float> r;
+            r.push_back(x*vasprun->latt[0][0]);
+            r.push_back(y*vasprun->latt[1][1]);
+            r.push_back(z*vasprun->latt[2][2]);
+            thisStep.fff.push_back(r);
+            }
+         vasprun->timesteps.push_back(thisStep);
+      }
+   }
+
+   //Get positions:
+//   xpath_node_set ns_positions = ns_timesteps.select_nodes(".//structure/varray[@name='positions']") ;
 
 
 //iterate over <array name="atoms"> tags (SHOULD ONLY BE ONE)
@@ -149,13 +191,15 @@ atomType atomTypeData
    }  */
 
 
-   
+
+/* OLD PARSING UNNEEDED */
+/*   
 
 
    for (tag* level1 = doc.FirstChildElement(); level1 != NULL; level1 = level1->NextSiblingElement()) {
       if (0==strcmp(level1->Value(),"modeling")) {
          for (tag* level2 = level1->FirstChildElement(); level2 != NULL; level2 = level2->NextSiblingElement()) {
-            if (0==strcmp(level2->Value(),"incar")) {
+            *//*if (0==strcmp(level2->Value(),"incar")) {
                for (tag* level3 = level2->FirstChildElement(); level3!=NULL; level3 = level3->NextSiblingElement()) {
                   if (0==strcmp(level3->Value(), "i") && 0==strcmp(level3->Attribute("name"),"POTIM")) {
                      vasprun->dt = stod(level3->FirstChild()->ToText()->Value());
@@ -165,8 +209,8 @@ atomType atomTypeData
                      vasprun->starting_temperature = stod(level3->FirstChild()->ToText()->Value());
                   }
                }
-            } else if (0==strcmp(level2->Value(),"atominfo")) {
-               for (tag* level3 = level2->FirstChildElement(); level3 != NULL; level3 = level3->NextSiblingElement()) {
+            } else *//* if (0==strcmp(level2->Value(),"atominfo")) {
+               for (tag0* level3 = level2->FirstChildElement(); level3 != NULL; level3 = level3->NextSiblingElement()) {
                   if (0==strcmp(level3->Value(),"atoms")) {
                      vasprun->numatoms = str2int(level3->FirstChild()->ToText()->Value());
                   } else if (0==strcmp(level3->Value(),"types")) {
@@ -177,7 +221,7 @@ atomType atomTypeData
                      }
                   }
                }
-            } else if (0==strcmp(level2->Value(),"structure")){
+            } else *//* if (0==strcmp(level2->Value(),"structure")){i
                if (0==strcmp(level2->Attribute("name"),"initialpos")) {
                   for (tag* level3 = level2->FirstChildElement(); level3 != NULL; level3 = level3->NextSiblingElement()) {
                      if (0==strcmp(level3->Value(),"crystal")) {
@@ -203,7 +247,7 @@ atomType atomTypeData
                      }
                   }              
                }
-            } else if (0==strcmp(level2->Value(),"calculation")) {
+            } else *//* if (0==strcmp(level2->Value(),"calculation")) {
                TimeStep thisStep;
                for (tag* level3 = level2->FirstChildElement(); level3 != NULL; level3 = level3->NextSiblingElement()) {
                   if (0==strcmp(level3->Value(),"structure")) {
@@ -238,6 +282,10 @@ atomType atomTypeData
          }
       } 
    }
+
+   */
+
+   cout << "DONE PARSING" << endl;
 
    vasprun->ntimesteps = vasprun->timesteps.size();
 
