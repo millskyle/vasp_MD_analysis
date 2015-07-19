@@ -22,7 +22,7 @@ int str2int(string ss){
 }
 
 void parse_atomtypes_tag(tag* atomtypesTag, FileInfo *vasprun ){
-   for (tag* level1 = atomtypesTag->FirstChildElement(); level1 != NULL; level1=level1->NextSiblingElement()) {
+/*   for (tag* level1 = atomtypesTag->FirstChildElement(); level1 != NULL; level1=level1->NextSiblingElement()) {
       if (0==strcmp(level1->Value(),"set")) {
          for (tag* rc = level1->FirstChildElement(); rc != NULL; rc = rc->NextSiblingElement()) {
             atomType atomTypeData; //struct to hold the data from this line
@@ -45,6 +45,7 @@ void parse_atomtypes_tag(tag* atomtypesTag, FileInfo *vasprun ){
          }
       }
    }
+   */
 }
 
 bool update_3d_vector(vector<threevector>* objectToUpdate, float x, float y, float z) {
@@ -109,13 +110,22 @@ int readXML(FileInfo *vasprun) {
    vasprun->numtypes = str2int(n_atominfo.child("types").value());
 
    //<array name="atomtypes">  
-   xpath_node_set ns_atomtypes = vdoc.select_nodes("//atominfo/array[@name='atomtypes']/set/rc");
+   xpath_node_set ns_atomtypes = n_atominfo.select_nodes("//atominfo/array[@name='atomtypes']/set/rc");
    
+
+   //iterate over the <set><rc> values and put the contents (<c></c>) into objects
    for (xpath_node_set::const_iterator it = ns_atomtypes.begin(); it != ns_atomtypes.end(); ++it) {
-      xpath_node_set ns_c = (*it).node().select_nodes("//c");
-      for (xpath_node_set::const_iterator it2 = ns_c.begin(); it2 != ns_c.end(); ++it2) {
-         cout << (*it2).node().child_value() << endl;
-      }
+      xpath_node_set ns_c = it->node().select_nodes(".//c");
+      atomType atomTypeData;
+      atomTypeData.atomspertype    = str2int(it->node().child("c").child_value() );
+      atomTypeData.element         = it->node().child("c").next_sibling().child_value();
+      atomTypeData.mass            = stod(it->node().child("c")\
+                                   .next_sibling().next_sibling().child_value() );
+      atomTypeData.valence         = stod(it->node().child("c").next_sibling()\
+                                   .next_sibling().next_sibling().child_value() ); 
+      atomTypeData.pseudopotential = it->node().child("c").next_sibling().next_sibling()\
+                                   .next_sibling().next_sibling().child_value() ;
+      vasprun->atoms.push_back(atomTypeData);   
    }  
 /*
    
