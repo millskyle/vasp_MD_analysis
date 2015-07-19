@@ -5,6 +5,7 @@
 #include "data_structure.h"
 #include "pugixml.hpp"
 #include "screen.h"
+#include "utility_functions.h"
 //#define TIXML_USE_STL
 
 using namespace std;
@@ -79,7 +80,7 @@ int readXML(FileInfo *vasprun) {
       xpath_node_set ns_c = it->node().select_nodes(".//c");
       atomType atomTypeData;
       atomTypeData.atomspertype    = str2int(it->node().child("c").child_value() );
-      atomTypeData.element         = it->node().child("c").next_sibling().child_value();
+      atomTypeData.element         = trim(it->node().child("c").next_sibling().child_value());
       atomTypeData.mass            = stod(it->node().child("c")\
                                    .next_sibling().next_sibling().child_value() );
       atomTypeData.valence         = stod(it->node().child("c").next_sibling()\
