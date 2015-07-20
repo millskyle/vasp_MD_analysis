@@ -16,7 +16,7 @@ int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
    
    //Make a gnuplot object.  It takes care of writing the data to a script.
    GnuPlotScript gnuplot ;
-   gnuplot.initialise("msd","Mean Square displacement","Time, [picoseconds]","Disance squared, angstroms^2","msd.pdf");
+   gnuplot.initialise("msd","Mean Square displacement","Time, [picoseconds]","Distance squared [angstroms^2]","msd.pdf");
    gnuplot.command("plot ",false);
 
 
