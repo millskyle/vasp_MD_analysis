@@ -65,6 +65,9 @@ struct FileInfo {
    float totalMass=0;
    double dt,starting_temperature; //timestep length, delta t
 
+   atomType allatoms;
+       
+   
    int dataIntoAtoms(){
       for (unsigned i=0; i<atoms.size(); i++) {
          vector<TimeStep> alltimes;
@@ -77,11 +80,31 @@ struct FileInfo {
             alltimes.push_back(ts);
          }
          atoms[i].timesteps = alltimes;
+         allatoms.timesteps = alltimes;
       }
       return 1;
    }
 
-   
+  
+   atomType GetAtomByIndex(int sID, int eID) {
+      atomType filtered;
+      vector<TimeStep> alltimes;
+      for (unsigned t=0;t<ntimesteps-1; t++) {
+         TimeStep ts;
+         for (unsigned i=sID; i<=eID; i++)  {
+            for (unsigned x=0 ; x<3; x++) {
+            //   cout << "At t=" << t << " atom " << i << " has " << x << " coordinate of " << allatoms.timesteps[t].ppp[i][x] << "." << endl;
+            }
+            ts.ppp.push_back(  allatoms.timesteps[t].ppp[i]  );
+            ts.fff.push_back(  allatoms.timesteps[t].fff[i]  );
+         }
+         alltimes.push_back(ts);
+      }
+      filtered.timesteps = alltimes;
+      return filtered;
+   }
+         
+
    atomType* GetAtom(string element) { 
    //returns a pointer to a specific atoms object, based on the passed element symbol
    //ie:   vasprun->GetAtom("Al")   returns a pointer the object holding the Aluminum atom info
@@ -95,6 +118,12 @@ struct FileInfo {
       cout << endl << endl << "FATAL ERROR!!!" <<endl<< "ATOM TYPE "<<element<<" NOT FOUND. EXITING." << endl;
       exit(0);
    }
+
+
+
+
+
+
 
    int unwrap() {
       int sign;
@@ -222,10 +251,17 @@ struct Configuration {
 
    bool forces;
    string forces_from_atom;
-   vector<string> forces_to_atoms;
+   string forces_to_atom;
    int forces_bins;
-   vector<string> force_field_atoms;
-   int force_field_resolution;
+
+   string forces_select;
+   int forces_from_sID;
+   int forces_from_eID;
+   int forces_to_sID;
+   int forces_to_eID;
+
+   bool index_show;
+
 
    ofstream script_wrapper;
    string script_wrapper_location = "output/make_all_plots.sh";

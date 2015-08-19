@@ -10,20 +10,34 @@
 int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    if (!config->forces) {cout << "\nForce projection called but not requested in configuration. Exiting"; return 1;}   
    screen.status << "Force Projections";
-   screen.step << "Bond force projections requested from " + config->forces_from_atom + " atoms to " + vec2str(config->forces_to_atoms) + " atoms ";
+   screen.step << "Bond force projections requested based on " + config->forces_select + "."; 
    //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
    vasprun->unwrap(); 
    
    //Make a gnuplot object.  It takes care of writing the data to a script.
    GnuPlotScript gnuplot ;
-   gnuplot.initialise("forces","Force","distance","Average force","force.pdf");
+   gnuplot.initialise("forces","Force","Separation distance [Angstrom]","Average force [eV/Angstrom]","force.pdf");
 //   gnuplot.command("set yrange [-1:1]");
    gnuplot.command("set xrange [0:]");
    gnuplot.command("plot ",false);
 
-   //first atom_type object
-   atomType* atomobject0 = vasprun->GetAtom(config->forces_from_atom);
-   
+
+   atomType* atomobject0;
+   atomType* atomobject1; 
+   atomType temporary;
+
+   if (config->forces_select == "type") {
+      atomobject0 = vasprun->GetAtom(config->forces_from_atom);
+      atomobject1 = vasprun->GetAtom(config->forces_to_atom);
+   } else if (config->forces_select == "index" ) {
+      temporary = vasprun->GetAtomByIndex(config->forces_from_sID, config->forces_from_eID);
+      atomobject0 = &temporary;
+      temporary = vasprun->GetAtomByIndex(config->forces_to_sID, config->forces_to_eID);
+      atomobject1 = &temporary;
+   }
+
+
+
    double dx,dy,dz,fx0,fy0,fz0,fx1,fy1,fz1; //components of the vectors between atoms
    double proj0, proj1; //scalar projections
    double distance, total_proj;
@@ -31,19 +45,21 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    vector<double> thisdata;
    double max_distance=0;
    double min_distance=100000000;
+   int number_of_projections = 2*atomobject1->timesteps[0].ppp.size()*atomobject0->timesteps[0].ppp.size()*(atomobject1->timesteps.size()-2);
+  //int number_of_projections = 2*atomobject1->timesteps[0].ppp.size()*atomobject0->timesteps[0].ppp.size()*20;
 
-   //For each atom in the requested atom types
-   for (int atomname=0; atomname < config->forces_to_atoms.size(); atomname++) {
-      //this pointer will point to the atomType object for this type of atom 
-      atomType* atomobject1 = vasprun->GetAtom(config->forces_to_atoms[atomname]);
-      screen.step << "Beginning force calculation for " + atomobject0->element + " to " + atomobject1->element;
+   double all_data_array [number_of_projections][2];
+
+
+
+      screen.step << "Beginning force projection.  " + to_string(number_of_projections) + " projections required."; 
       //for each valid timestep
-      for (int t=0; t < atomobject1->timesteps.size()-2; t++ ) {
-//         cout << "t=" << t << "\n";
-         //for each atom in the position vector of vectors
-         for (int a=0; a<atomobject1->atomspertype; a++) {
-            //for each atom of the second type
-            for (int b=0; b<atomobject0->atomspertype; b++) {
+      int counter=0;
+
+
+      for (int t=0; t < atomobject1->timesteps.size()-2; t++ ) {   // -2 as the last timestep could be incomplete
+         for (int a=0; a<atomobject1->timesteps[0].ppp.size(); a++) {
+            for (int b=0; b<atomobject0->timesteps[0].ppp.size(); b++) {
 
                //vector between the two atoms
                //if (rand()%10==1 || 1==1) {  //only actually calculate 10% of the force projections. (for speed).
@@ -66,8 +82,8 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
                   fy1 = atomobject1->timesteps[t].fff[a][1];
                   fz1 = atomobject1->timesteps[t].fff[a][2];
                  
-         //         cout << "forces:  atom1: " << fx0 << "," << fy0 << "," << fz0 << ".\n" ; 
-           //       cout << "forces:  atom2: " << fx1 << "," << fy1 << "," << fz1 << ".\n" ; 
+//                  cout << "forces:  atom1: " << fx0 << "," << fy0 << "," << fz0 << ".\n" ; 
+//                  cout << "forces:  atom2: " << fx1 << "," << fy1 << "," << fz1 << ".\n" ; 
 
                   //project them
                   // (F dot r) / |r|
@@ -77,19 +93,12 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
          //         cout << "Projection: atom1 onto r: " << proj0 << "\n";
          //         cout << "Projection: atom2 onto r: " << proj1 << "\n";
                    
-                  //push the first projection into the all_data vector
-                  thisdata.clear();
-                  thisdata.push_back(distance);
-                  //one projection has to be negative because dx,dy,dz vector is in wrong direction for it. 
-                  thisdata.push_back(-proj1);
-                  all_data.push_back(thisdata);
-                  
-                  //push the second projection
-                  thisdata.clear();
-                  thisdata.push_back(distance);
-                  thisdata.push_back(proj0);
-                  all_data.push_back(thisdata);
-//               } //endif
+                  all_data_array[counter][0] = distance;
+                  all_data_array[counter][1] = -proj1;
+                  counter++;
+                  all_data_array[counter][0] = distance;
+                  all_data_array[counter][1] = proj0;
+                  counter ++;
             } 
          }
       }
@@ -105,22 +114,24 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
       bins_sum.push_back(0.0);
    }
   
+   
    //calculate the width of each bin 
    double bin_width = max_distance / config->forces_bins;
 
    //for each data point, put it in the correct bin and increment the bin counter
-   for (int i=0; i<all_data.size(); i++) { 
-      //cout << "distance=" << all_data[i][0] << " and force=" << all_data[i][1] << "\n";
-      bins_count[floor(all_data[i][0] / bin_width)]++;
-      bins_sum[floor(all_data[i][0] / bin_width)]+= all_data[i][1];
+   for (int i=0; i<number_of_projections-2; i++) { 
+      bins_count[floor(all_data_array[i][0] / bin_width)]++;
+      bins_sum[floor(all_data_array[i][0] / bin_width)]+= all_data_array[i][1];
    }
+
 
    //calculate the standard deviation for each bin
    int thisbin;
-   for (int i=0; i<all_data.size(); i++) {
-      thisbin = floor(all_data[i][0] / bin_width);
-      bins_std_dev[thisbin] += pow((all_data[i][1] - (bins_sum[thisbin] / bins_count[thisbin])),2);
+   for (int i=0; i<number_of_projections-2; i++) {
+      thisbin = floor(all_data_array[i][0] / bin_width);
+      bins_std_dev[thisbin] += pow((all_data_array[i][1] - (bins_sum[thisbin] / bins_count[thisbin])),2);
    }
+
 
    //normalize/sqrt the standard deviation
    for (int i=0; i<bins_std_dev.size(); i++) {
@@ -132,21 +143,15 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    
    //write out the gnuplot command
    gnuplot.command(
-      "'forces_" 
-      + atomobject1->element 
-      + ".data' using 1:2 with lines title '" 
+      "'forces.data' using 1:2 with lines title '" 
       + atomobject1->element 
       + "' ls "
       + gnuplot.style()
       + " lw 3 , "
-      + " 'forces_" 
-      + atomobject1->element 
-      + ".data' using 1:($2-$3) with lines ls " 
+      + " 'forces.data' using 1:($2-$3) with lines ls " 
       + gnuplot.style() 
       + " lw 0.5, "
-      + " 'forces_" 
-      + atomobject1->element 
-      + ".data' using 1:($2+$3) with lines ls " 
+      + " 'forces.data' using 1:($2+$3) with lines ls " 
       + gnuplot.style() 
       + " lw 0.5, "
       ,false);
@@ -162,7 +167,7 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    
    //write out the data for this element to an element-specific file
    ofstream of;
-   of.open("output/forces_" + atomobject1->element + ".data");     
+   of.open("output/forces.data");     
    for (int i=0; i <= bins_sum.size(); i++) {
       if (bins_count[i]>0) {
          if (i*bin_width < smallest_dimension/2.0) {
@@ -173,7 +178,7 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    of.close();
 
    
-}
+//201508   }
 
    gnuplot.close();
    //add a command to the global plot script to make the msd plots

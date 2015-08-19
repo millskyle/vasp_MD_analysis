@@ -58,12 +58,20 @@ void parse_inputfile(Configuration& config, const Node& node) {
 
    parse(plots, "forces", config.forces);
    parse(plots, "forces_from_atom",config.forces_from_atom);
-   parse(plots, "forces_to_atoms", config.tempstr);
-      config.forces_to_atoms = str2vec(config.tempstr);
+   parse(plots, "forces_to_atom", config.forces_to_atom);
    parse(plots, "forces_bins", config.forces_bins);
-   parse(plots, "force_field_atoms", config.tempstr);
-      config.force_field_atoms = str2vec(config.tempstr);
-   parse(plots, "force_field_resolution", config.force_field_resolution);
+
+  parse(plots, "forces_select",config.forces_select);
+  parse(plots, "forces_from_sID",config.forces_from_sID);
+  parse(plots, "forces_from_eID", config.forces_from_eID);
+  parse(plots, "forces_to_sID", config.forces_to_sID);
+  parse(plots, "forces_to_eID", config.forces_to_eID);
+
+const Node& IO = node["IO"];
+  parse(IO, "index_show", config.index_show);
+
+
+
 }
 
 

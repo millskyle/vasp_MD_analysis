@@ -4,11 +4,11 @@ files:
 
 
 plots:
-  msd: True
+  msd: False
   msd_data_prefix: "msd_"
   msd_atoms: 'Al   '
 
-  rdf: True
+  rdf: False
   rdf_data_prefix: "rdf_"
   rdf_atoms: 'Al '
   rdf_bins: 500
@@ -20,8 +20,8 @@ plots:
   rho_data_prefix: "rho_"
   rho_atoms: 'Al'
 
-  spatial_distribution_projection: True
-  spatial_distribution_lattice: True
+  spatial_distribution_projection: False
+  spatial_distribution_lattice: False
   collapse_dimension: 2
   lattice_atoms: ' '
   liquid_atoms: 'Al'
@@ -29,10 +29,22 @@ plots:
   nbins_y: 75
 
   forces: True
-  forces_from_atom: 'Al'
-  forces_to_atoms: 'N '
-  forces_bins: 250
 
+  # determines the method used to select atoms for force projections.
+  #    index:  selects atoms with indices between forces_from_sID and forces_from_eID 
+  #    type: selects atoms whose type (element symbol) is in forces_from_atom
+  forces_select: "index" 
+  forces_from_sID: 100
+  forces_from_eID: 200
+  forces_to_sID: 100
+  forces_to_eID: 200
+
+ # forces_select: "type"
+  forces_from_atom: 'Al'
+  forces_to_atom: 'N'
+
+
+  forces_bins: 250
   force_field_atoms: 'Al'
   force_field_resolution: 15
 
