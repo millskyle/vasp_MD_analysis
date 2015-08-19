@@ -67,8 +67,7 @@ void parse_inputfile(Configuration& config, const Node& node) {
   parse(plots, "forces_to_sID", config.forces_to_sID);
   parse(plots, "forces_to_eID", config.forces_to_eID);
 
-const Node& IO = node["IO"];
-  parse(IO, "index_show", config.index_show);
+  const Node& IO = node["IO"];
 
 
 

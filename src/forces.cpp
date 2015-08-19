@@ -22,20 +22,26 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    gnuplot.command("plot ",false);
 
 
+
+
    atomType* atomobject0;
    atomType* atomobject1; 
-   atomType temporary;
+   atomType temporary0;
+   atomType temporary1;
 
    if (config->forces_select == "type") {
-      atomobject0 = vasprun->GetAtom(config->forces_from_atom);
-      atomobject1 = vasprun->GetAtom(config->forces_to_atom);
+      atomType temporary0 = *(vasprun->GetAtom(config->forces_from_atom));
+      atomType temporary1 = *(vasprun->GetAtom(config->forces_to_atom));
    } else if (config->forces_select == "index" ) {
-      temporary = vasprun->GetAtomByIndex(config->forces_from_sID, config->forces_from_eID);
-      atomobject0 = &temporary;
-      temporary = vasprun->GetAtomByIndex(config->forces_to_sID, config->forces_to_eID);
-      atomobject1 = &temporary;
+      atomType temporary0 = (vasprun->GetAtomByIndex(config->forces_from_sID, config->forces_from_eID));
+      atomType temporary1 = (vasprun->GetAtomByIndex(config->forces_to_sID, config->forces_to_eID));
+//      atomobject1 = *temporary;
    }
 
+   atomobject0 = &temporary0;
+   atomobject1 = &temporary1;
+
+   cout << "HERE" << endl;
 
 
    double dx,dy,dz,fx0,fy0,fz0,fx1,fy1,fz1; //components of the vectors between atoms
@@ -53,6 +59,7 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
 
 
       screen.step << "Beginning force projection.  " + to_string(number_of_projections) + " projections required."; 
+      cout << "    ( 2 x " << atomobject0->timesteps[0].ppp.size() << " atoms x " << atomobject1->timesteps[0].ppp.size() << " atoms x " << (atomobject1->timesteps.size()-2) << " timesteps." << endl;
       //for each valid timestep
       int counter=0;
 

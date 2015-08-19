@@ -1,3 +1,6 @@
+IO: 
+  #index_show: True
+
 files:
   log: "log"
   script_wrapper: "output/make_all_plots.sh"
@@ -34,10 +37,10 @@ plots:
   #    index:  selects atoms with indices between forces_from_sID and forces_from_eID 
   #    type: selects atoms whose type (element symbol) is in forces_from_atom
   forces_select: "index" 
-  forces_from_sID: 100
-  forces_from_eID: 200
-  forces_to_sID: 100
-  forces_to_eID: 200
+  forces_from_sID: 0
+  forces_from_eID: 63
+  forces_to_sID: 128
+  forces_to_eID: 427
 
  # forces_select: "type"
   forces_from_atom: 'Al'

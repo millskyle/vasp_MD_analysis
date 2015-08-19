@@ -69,6 +69,7 @@ struct FileInfo {
        
    
    int dataIntoAtoms(){
+      int counter=0;
       for (unsigned i=0; i<atoms.size(); i++) {
          vector<TimeStep> alltimes;
          for (unsigned t=0;t<ntimesteps-1; t++) {
@@ -80,21 +81,22 @@ struct FileInfo {
             alltimes.push_back(ts);
          }
          atoms[i].timesteps = alltimes;
-         allatoms.timesteps = alltimes;
       }
+      allatoms.timesteps = timesteps;
       return 1;
    }
 
   
    atomType GetAtomByIndex(int sID, int eID) {
+      cout << "Filtering atoms from index " + to_string(sID) + " to " + to_string(eID) + "." << endl;
       atomType filtered;
       vector<TimeStep> alltimes;
       for (unsigned t=0;t<ntimesteps-1; t++) {
          TimeStep ts;
          for (unsigned i=sID; i<=eID; i++)  {
-            for (unsigned x=0 ; x<3; x++) {
-            //   cout << "At t=" << t << " atom " << i << " has " << x << " coordinate of " << allatoms.timesteps[t].ppp[i][x] << "." << endl;
-            }
+//            for (unsigned x=0 ; x<3; x++) {
+//               cout << "At t=" << t << " atom " << i << " has " << x << " coordinate of " << allatoms.timesteps[t].ppp[i][x] << ".  " << to_string(allatoms.timesteps[0].ppp.size()) <<  endl;
+//            }
             ts.ppp.push_back(  allatoms.timesteps[t].ppp[i]  );
             ts.fff.push_back(  allatoms.timesteps[t].fff[i]  );
          }
@@ -118,11 +120,6 @@ struct FileInfo {
       cout << endl << endl << "FATAL ERROR!!!" <<endl<< "ATOM TYPE "<<element<<" NOT FOUND. EXITING." << endl;
       exit(0);
    }
-
-
-
-
-
 
 
    int unwrap() {
@@ -199,9 +196,6 @@ struct FileInfo {
 
 
    }
-   
-
-
 
 
    FileInfo() {

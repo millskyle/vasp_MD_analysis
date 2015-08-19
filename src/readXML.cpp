@@ -134,7 +134,16 @@ int readXML(FileInfo *vasprun) {
       }
    }
 
+
    cout << "DONE PARSING" << endl;
+   
+   
+   int index_counter=0;
+   for (unsigned  i=0; i < vasprun->atoms.size(); i++ ) {
+      vasprun->atoms[i].sindex = index_counter;
+      vasprun->atoms[i].eindex = index_counter + vasprun->atoms[i].atomspertype-1;
+      index_counter = vasprun->atoms[i].eindex+1;
+   }
 
    vasprun->ntimesteps = vasprun->timesteps.size();
 
@@ -157,14 +166,10 @@ int readXML(FileInfo *vasprun) {
       screen.data("      MASS", vasprun->atoms[i].mass);
       screen.data("      VALENCE",vasprun->atoms[i].valence );
       screen.data("      PP", vasprun->atoms[i].pseudopotential);
+      screen.data("      sINDEX", vasprun->atoms[i].sindex);
+      screen.data("      eINDEX", vasprun->atoms[i].eindex);
    }
 
-   int index_counter=0;
-   for (unsigned  i=0; i < vasprun->atoms.size(); i++ ) {
-      vasprun->atoms[i].sindex = index_counter;
-      vasprun->atoms[i].eindex = index_counter + vasprun->atoms[i].atomspertype-1;
-      index_counter = vasprun->atoms[i].eindex+1;
-   }
    
    screen.status << "Splitting up data by atom type";
    vasprun->dataIntoAtoms();
