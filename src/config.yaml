@@ -37,8 +37,8 @@ plots:
   #    index:  selects atoms with indices between forces_from_sID and forces_from_eID 
   #    type: selects atoms whose type (element symbol) is in forces_from_atom
   forces_select: "index" 
-  forces_from_sID: 0
-  forces_from_eID: 63
+  forces_from_sID: 64
+  forces_from_eID: 127
   forces_to_sID: 128
   forces_to_eID: 427
 
@@ -47,7 +47,7 @@ plots:
   forces_to_atom: 'N'
 
 
-  forces_bins: 250
+  forces_bins: 100
   force_field_atoms: 'Al'
   force_field_resolution: 15
 

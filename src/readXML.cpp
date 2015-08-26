@@ -89,7 +89,23 @@ int readXML(FileInfo *vasprun) {
                                    .next_sibling().next_sibling().child_value() ;
 //      cout << "TEST~" << endl;
       vasprun->atoms.push_back(atomTypeData);   
-   }  
+   }
+
+   //select the 'atoms' array (containing ion symbols)
+   n_temp = n_atominfo.select_nodes("//atominfo/array[@name='atoms']")[0].node();
+   //from the <array> tag, select .//set/rc
+   xpath_node_set ns_ionlist = n_temp.select_nodes(".//set/rc");
+   int counter=0;
+   string symbol;
+   for (xpath_node_set::const_iterator it = ns_ionlist.begin(); it != ns_ionlist.end(); ++it) {
+      symbol=it->node().child("c").child_value();
+      vasprun->ion_symbols.push_back( symbol );
+//      cout << counter  << "    " <<  symbol <<  endl;
+      counter++;
+   }
+
+
+
 
    //Get the lattice vectors
    n_temp = doc.select_nodes("//modeling/structure[@name='initialpos']/crystal/varray[@name='basis']")[0].node();

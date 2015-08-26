@@ -62,12 +62,13 @@ struct FileInfo {
    vector<threevector> COM; //centre of mass
    vector<atomType> atoms;
    vector<TimeStep> timesteps;
+   vector<string> ion_symbols;
    float totalMass=0;
    double dt,starting_temperature; //timestep length, delta t
 
    atomType allatoms;
        
-   
+  
    int dataIntoAtoms(){
       int counter=0;
       for (unsigned i=0; i<atoms.size(); i++) {
@@ -88,7 +89,7 @@ struct FileInfo {
 
   
    atomType GetAtomByIndex(int sID, int eID) {
-      cout << "Filtering atoms from index " + to_string(sID) + " to " + to_string(eID) + "." << endl;
+   //   cout << "Filtering atoms from index " + to_string(sID) + " to " + to_string(eID) + "." << endl;
       atomType filtered;
       vector<TimeStep> alltimes;
       for (unsigned t=0;t<ntimesteps-1; t++) {
@@ -103,6 +104,7 @@ struct FileInfo {
          alltimes.push_back(ts);
       }
       filtered.timesteps = alltimes;
+    //  cout << filtered.timesteps.size() << endl; 
       return filtered;
    }
          
