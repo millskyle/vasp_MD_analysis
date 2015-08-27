@@ -47,7 +47,7 @@ plots:
   forces_to_atom: 'N'
 
 
-  forces_bins: 100
+  forces_bins: 300
   force_field_atoms: 'Al'
   force_field_resolution: 15
 

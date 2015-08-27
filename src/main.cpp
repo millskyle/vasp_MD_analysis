@@ -45,7 +45,6 @@ int main() {
       spatial_distribution_projection(&v, &config);
    }
    if (config.forces) {
-      force_field(&v, &config);
       force_bond_projections(&v, &config);
    }
 
