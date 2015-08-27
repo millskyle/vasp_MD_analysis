@@ -33,6 +33,10 @@ plots:
   # determines the method used to select atoms for force projections.
   #    index:  selects atoms with indices between forces_from_sID and forces_from_eID 
   #    type: selects atoms whose type (element symbol) is in forces_from_atom
+
+  force_set_1: 'forces1'
+  force_set_2: 'forces2'
+
   forces_select: "index" 
   forces_from_sID: 64
   forces_from_eID: 127
@@ -50,14 +54,15 @@ plots:
 
 
 
-atom_selections:
-  - name: 'force_projection_start'
-    filter_type: "index_range"
-    criteria: "{64..100},{101..127}"
 
-  - name: 'force_projection_end'
-    filter_type: "type"
-    criteria: "Al"
+atom_sets:
+  - name: 'forces1'
+    filter_type: "index_range"
+    criteria: "101:127,0:100"
+
+  - name: 'forces2'
+    filter_type: "symbol"
+    criteria: "Al "
 
 
   

@@ -14,6 +14,9 @@
 
 using namespace std;
 
+typedef vector<float> threevector;
+
+
 
 
 int count_atoms_in_box_pointer(vector<threevector>* positions, double xmin, double xmax, double ymin, double ymax, double zmin, double zmax) { 
@@ -42,6 +45,12 @@ int count_atoms_in_box(vector<threevector> positions, double xmin, double xmax, 
 return total;
 }
 
+
+
+string string_replace( string old, string nnew, string subject) {
+   subject.replace(subject.find(old), old.length(), nnew);
+   return subject;
+}
 
 
 string vec2str(vector<string> v, string delimiter=" ") {

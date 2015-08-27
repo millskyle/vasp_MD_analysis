@@ -6,6 +6,8 @@
 #include <vector>
 #include <string.h>
 #include <cmath>
+#include "utility_functions.h"
+#include "screen.h"
 
 using namespace std;
 
@@ -31,24 +33,11 @@ void printmap(DEBUG_LEVEL level, const Container& c) {
         std::cout << *it << '\n';
     }
 } 
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* Code I copied/modified to display some information about maps */
 
 
 
 typedef vector<float> threevector;
-
 
 struct key {
    string name;
@@ -75,6 +64,7 @@ struct TimeStep {
    }
 };
 
+
 struct atomType {
    int atomindex; //the index of the atom referenced by the parent.
    int atomspertype, sindex, eindex;
@@ -86,6 +76,12 @@ struct atomType {
       atomspertype=0; element="X  ";mass = 0.00; valence = 0.00; pseudopotential="garbage";
    }
 }; 
+
+
+struct atomSet {
+   vector<string> symbols;
+   atomType atoms;
+};
 
 
 struct FileInfo {
@@ -126,27 +122,27 @@ struct FileInfo {
       return 1;
    }
 
+
+
   
    atomType GetAtomByIndex(int sID, int eID) {
-   //   cout << "Filtering atoms from index " + to_string(sID) + " to " + to_string(eID) + "." << endl;
       atomType filtered;
       vector<TimeStep> alltimes;
       for (unsigned t=0;t<ntimesteps-1; t++) {
          TimeStep ts;
          for (unsigned i=sID; i<=eID; i++)  {
-//            for (unsigned x=0 ; x<3; x++) {
-//               cout << "At t=" << t << " atom " << i << " has " << x << " coordinate of " << allatoms.timesteps[t].ppp[i][x] << ".  " << to_string(allatoms.timesteps[0].ppp.size()) <<  endl;
-//            }
             ts.ppp.push_back(  allatoms.timesteps[t].ppp[i]  );
             ts.fff.push_back(  allatoms.timesteps[t].fff[i]  );
          }
          alltimes.push_back(ts);
       }
       filtered.timesteps = alltimes;
-    //  cout << filtered.timesteps.size() << endl; 
       return filtered;
    }
-         
+      
+
+
+   
 
    atomType* GetAtom(string element) { 
    //returns a pointer to a specific atoms object, based on the passed element symbol
@@ -251,17 +247,90 @@ struct FileInfo {
       latt_y.push_back(0);
       latt_y.push_back(0);
       latt_z.push_back(0);
-      latt_z.push_back(0);
+eparation distance [Angstrom]
+6
       latt_z.push_back(0);*/
 
    }
 };
 
+
 struct atomfilter {
    string name;
    string filter_type;
    string criteria;
+   atomSet atoms;
+   vector<int> filter_indices;
+
+   int execute_filter() {
+      if (filter_type == "index_range") {
+         vector<string> ranges = str2vec(criteria,",");
+         for (int i=0; i < ranges.size(); i++) {
+            vector<string> thisRange = str2vec(ranges[i], ":");
+            int sind = stoi(thisRange[0]);
+            int eind = stoi(thisRange[1]);
+
+            if (sind <= eind) {
+               cout << sind << " to " << eind << endl;
+               for (int jj=sind; jj<=eind; jj++) {
+                  filter_indices.push_back(jj);
+               }
+            } else {
+               screen.error << "INVALID FILTER INDICES. Start index must be less than or equal to end index";
+            }
+         }
+         sort(filter_indices.begin(), filter_indices.end() );
+         for (int i=0;i<filter_indices.size(); i++) {
+            cout << filter_indices[i] << " " ;
+         }
+         cout << endl; 
+
+         
+      }
+   return 0;
+}
+
+
+/*
+   atomType GetAtomByIndex(int sID, int eID) {
+      atomType filtered;
+      vector<TimeStep> alltimes;
+      for (unsigned t=0;t<ntimesteps-1; t++) {
+         TimeStep ts;
+         for (unsigned i=sID; i<=eID; i++)  {
+            ts.ppp.push_back(  allatoms.timesteps[t].ppp[i]  );
+            ts.fff.push_back(  allatoms.timesteps[t].fff[i]  );
+         }
+         alltimes.push_back(ts);
+      }
+      filtered.timesteps = alltimes;
+      return filtered;
+   }
+ 
+
+
+*/
+     
+/*
+
+
+
+      } else if (filter_type == "symbol") {
+      
+      } else if (filter_type == "indices") {
+
+
+      } 
+
+
+   }
+*/
+
+
+
 };
+
+
 
 struct Configuration {
    string tempstr;
@@ -301,10 +370,11 @@ struct Configuration {
    int forces_to_sID;
    int forces_to_eID;
 
+   vector<string> filter_name_list;
+
    bool index_show;
 
    map <string, atomfilter> atomfilters;   
-
 
    ofstream script_wrapper;
    string script_wrapper_location = "output/make_all_plots.sh";

@@ -30,6 +30,13 @@ int main() {
       screen.finished << "Successfully read XML file";
    }
 
+   screen.section << "CREATING ATOM SUBSETS";
+   for (int i=0; i<config.filter_name_list.size(); i++) {
+      screen.step << "Creating set: " + config.filter_name_list[i]; 
+      config.atomfilters[config.filter_name_list[i]].execute_filter();
+   }
+
+
 
    screen.section << "PLOTS";
    if (config.msd) {
