@@ -17,6 +17,18 @@ static void parse(const Node& node, const char* key, T& value) {
     }
 }
 
+static map<string, atomfilter> parse_atom_selections( const Node& node) {
+   const Node& atom_selections = node["atom_selections"];
+   map<string, atomfilter> allfilters;
+   for (int i=0; i < atom_selections.size(); i++) {
+      atomfilter thisFilter;
+      parse(atom_selections[i], "name", thisFilter.name);
+      parse(atom_selections[i], "filter_type", thisFilter.filter_type);
+      parse(atom_selections[i], "criteria", thisFilter.criteria);
+      allfilters[thisFilter.name] = thisFilter;
+   }
+   return allfilters;
+}
 
 void parse_inputfile(Configuration& config, const Node& node) {
    const Node& files = node["files"];
@@ -61,17 +73,28 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "forces_to_atom", config.forces_to_atom);
    parse(plots, "forces_bins", config.forces_bins);
 
-  parse(plots, "forces_select",config.forces_select);
-  parse(plots, "forces_from_sID",config.forces_from_sID);
-  parse(plots, "forces_from_eID", config.forces_from_eID);
-  parse(plots, "forces_to_sID", config.forces_to_sID);
-  parse(plots, "forces_to_eID", config.forces_to_eID);
+   parse(plots, "forces_select",config.forces_select);
+   parse(plots, "forces_from_sID",config.forces_from_sID);
+   parse(plots, "forces_from_eID", config.forces_from_eID);
+   parse(plots, "forces_to_sID", config.forces_to_sID);
+   parse(plots, "forces_to_eID", config.forces_to_eID);
 
-  const Node& IO = node["IO"];
+   config.atomfilters = parse_atom_selections( node );
+   
 
+   cout << "filters" << endl;
+   cout << config.atomfilters["force_projection_start"].name << config.atomfilters["force_projection_start"].criteria << endl;
+   cout << "Filters" << endl;
 
+   map<int, int> m;// {{1, 2}, {3, 4}};
+   m[1] = 2;
+   m[3] = 4;
+
+   printmap(1,config.atomfilters);
 
 }
+
+
 
 
 

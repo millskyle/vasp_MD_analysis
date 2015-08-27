@@ -2,11 +2,50 @@
 #define STORAGE_H_
 
 #include <string>
+#include <map>
 #include <vector>
 #include <string.h>
 #include <cmath>
 
 using namespace std;
+
+
+
+
+/* Code I copied/modified to display some information about maps */
+typedef int DEBUG_LEVEL;
+int d_level = 0;
+
+template<typename Key, typename Value>
+std::ostream& operator<<(std::ostream& os, const std::pair<const Key, Value>& p)
+{
+       os << p.first << " => " << &p.second;
+           return os;
+}
+
+template<typename Container>
+void printmap(DEBUG_LEVEL level, const Container& c) {
+    if (level >= d_level) {
+        for(typename Container::const_iterator it = c.begin();
+            it != c.end(); ++it)
+        std::cout << *it << '\n';
+    }
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 typedef vector<float> threevector;
 
@@ -218,6 +257,12 @@ struct FileInfo {
    }
 };
 
+struct atomfilter {
+   string name;
+   string filter_type;
+   string criteria;
+};
+
 struct Configuration {
    string tempstr;
    
@@ -258,6 +303,8 @@ struct Configuration {
 
    bool index_show;
 
+   map <string, atomfilter> atomfilters;   
+
 
    ofstream script_wrapper;
    string script_wrapper_location = "output/make_all_plots.sh";
@@ -270,6 +317,7 @@ struct Configuration {
 
    
 } config;
+   
 
 
 struct GnuPlotScript {

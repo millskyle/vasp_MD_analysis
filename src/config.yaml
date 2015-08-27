@@ -1,6 +1,3 @@
-IO: 
-  #index_show: True
-
 files:
   log: "log"
   script_wrapper: "output/make_all_plots.sh"
@@ -50,6 +47,24 @@ plots:
   forces_bins: 300
   force_field_atoms: 'Al'
   force_field_resolution: 15
+
+
+
+atom_selections:
+  - name: 'force_projection_start'
+    filter_type: "index_range"
+    criteria: "{64..100},{101..127}"
+
+  - name: 'force_projection_end'
+    filter_type: "type"
+    criteria: "Al"
+
+
+  
+
+
+
+
 
 
 
