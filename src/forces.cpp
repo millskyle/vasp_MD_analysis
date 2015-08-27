@@ -47,72 +47,75 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    double max_distance=0;
    double min_distance=100000000;
    int number_of_projections = 2*atomobject1->timesteps[0].ppp.size()*atomobject0->timesteps[0].ppp.size()*(atomobject1->timesteps.size()-2);
-  //int number_of_projections = 2*atomobject1->timesteps[0].ppp.size()*atomobject0->timesteps[0].ppp.size()*20;
-   cout << number_of_projections << endl;
 
    double all_data_array [number_of_projections][2];
 
 
-      screen.step << "Beginning force projection.  " + to_string(number_of_projections) + " projections required."; 
-      cout << "    ( 2 x " << atomobject0->timesteps[0].ppp.size() << " atoms x " << atomobject1->timesteps[0].ppp.size() << " atoms x " << (atomobject1->timesteps.size()-2) << " timesteps." << endl;
+   screen.step << "Beginning force projection."; 
+
+   screen.data("Projections"," 2 orientations x " 
+         + to_string(atomobject0->timesteps[0].ppp.size())  
+         + " atoms x "  
+         + to_string(atomobject1->timesteps[0].ppp.size()) 
+         +  " atoms x " 
+         + to_string((atomobject1->timesteps.size()-2)) 
+         +  " timesteps = "
+         + to_string(number_of_projections)
+         + " projections"
+   );
       //for each valid timestep
-      int counter=0;
+   int counter=0;
 
 
-      for (int t=0; t < atomobject1->timesteps.size()-2; t++ ) {   // -2 as the last timestep could be incomplete
-         for (int a=0; a<atomobject1->timesteps[0].ppp.size(); a++) {
-            for (int b=0; b<atomobject0->timesteps[0].ppp.size(); b++) {
-   //               cout << t << " " << a << " " << b << endl;
-               //vector between the two atoms
-               //if (rand()%10==1 || 1==1) {  //only actually calculate 10% of the force projections. (for speed).
-                  dx = atomobject0->timesteps[t].ppp[b][0] - atomobject1->timesteps[t].ppp[a][0];
-                  dy = atomobject0->timesteps[t].ppp[b][1] - atomobject1->timesteps[t].ppp[a][1];
-                  dz = atomobject0->timesteps[t].ppp[b][2] - atomobject1->timesteps[t].ppp[a][2];
-                  //minimum image correction:
-                  dx = dx - nint(dx / vasprun->latt[0][0])*vasprun->latt[0][0];
-                  dy = dy - nint(dy / vasprun->latt[1][1])*vasprun->latt[1][1];
-                  dz = dz - nint(dz / vasprun->latt[2][2])*vasprun->latt[2][2];
-                  //distance between both atoms:
-                  distance = sqrt(dx*dx + dy*dy + dz*dz);
-                  if (distance > max_distance) { max_distance = distance; }
-                  if (distance < min_distance) { min_distance = distance; }
-                  //get the forces from the atom objects
-                  fx0 = atomobject0->timesteps[t].fff[b][0];
-                  fy0 = atomobject0->timesteps[t].fff[b][1];
-                  fz0 = atomobject0->timesteps[t].fff[b][2];
-                  fx1 = atomobject1->timesteps[t].fff[a][0];
-                  fy1 = atomobject1->timesteps[t].fff[a][1];
-                  fz1 = atomobject1->timesteps[t].fff[a][2];
-                 
-//                  cout << "forces:  atom1: " << fx0 << "," << fy0 << "," << fz0 << ".\n" ; 
-//                  cout << "forces:  atom2: " << fx1 << "," << fy1 << "," << fz1 << ".\n" ; 
+   for (int t=0; t < atomobject1->timesteps.size()-2; t++ ) {   // -2 as the last timestep could be incomplete
+      for (int a=0; a<atomobject1->timesteps[0].ppp.size(); a++) {
+         for (int b=0; b<atomobject0->timesteps[0].ppp.size(); b++) {
+            //vector between the two atoms
+            dx = atomobject0->timesteps[t].ppp[b][0] - atomobject1->timesteps[t].ppp[a][0];
+            dy = atomobject0->timesteps[t].ppp[b][1] - atomobject1->timesteps[t].ppp[a][1];
+            dz = atomobject0->timesteps[t].ppp[b][2] - atomobject1->timesteps[t].ppp[a][2];
+            //minimum image correction:
+            dx = dx - nint(dx / vasprun->latt[0][0])*vasprun->latt[0][0];
+            dy = dy - nint(dy / vasprun->latt[1][1])*vasprun->latt[1][1];
+            dz = dz - nint(dz / vasprun->latt[2][2])*vasprun->latt[2][2];
+            //distance between both atoms:
+            distance = sqrt(dx*dx + dy*dy + dz*dz);
+            max_distance = max(distance, max_distance);
+            min_distance = min(distance, min_distance);
 
-                  //project them
-                  // (F dot r) / |r|
-                  proj0 = (fx0*dx + fy0*dy + fz0*dz)/distance;
-                  proj1 = (fx1*dx + fy1*dy + fz1*dz)/distance;
+            //if (distance > max_distance) { max_distance = distance; }
+            //if (distance < min_distance) { min_distance = distance; }
 
-         //         cout << "Projection: atom1 onto r: " << proj0 << "\n";
-         //         cout << "Projection: atom2 onto r: " << proj1 << "\n";
-                   
-                  all_data_array[counter][0] = distance;
-                  all_data_array[counter][1] = -proj1;
-                  counter++;
-                  all_data_array[counter][0] = distance;
-                  all_data_array[counter][1] = proj0;
-                  counter ++;
-            } 
-         }
+            //get the forces from the atom objects
+            fx0 = atomobject0->timesteps[t].fff[b][0];
+            fy0 = atomobject0->timesteps[t].fff[b][1];
+            fz0 = atomobject0->timesteps[t].fff[b][2];
+            fx1 = atomobject1->timesteps[t].fff[a][0];
+            fy1 = atomobject1->timesteps[t].fff[a][1];
+            fz1 = atomobject1->timesteps[t].fff[a][2];
+           
+            //project them
+            // (F dot r) / |r|
+            proj0 = (fx0*dx + fy0*dy + fz0*dz)/distance;
+            proj1 = (fx1*dx + fy1*dy + fz1*dz)/distance;
+
+            all_data_array[counter][0] = distance;
+            all_data_array[counter][1] = -proj1;
+            counter++;   //Increment the counter. The reverse projection needs to go into another element
+            all_data_array[counter][0] = distance;
+            all_data_array[counter][1] = proj0;
+            counter ++; 
+         } 
       }
-   
-   cout << "There are no atoms closer together than " << min_distance << " angstroms." <<endl;
-   cout << "There are no atoms further apart than " << max_distance << " angstroms." <<endl;
+   }
 
+   screen.data("Separation distances","");
+   screen.data("   Minimum",min_distance);
+   screen.data("   Maximum",max_distance);
    
    //gnuplot.command("set xrange [" + to_string(min_distance) + ":]"); 
    gnuplot.command("set xrange [0:]"); // + to_string(min_distance) + ":]"); 
    gnuplot.command("set style fill transparent solid 0.40 noborder");
-   
 
    //make vectors that are the correct size (ie: number of bins)
    //to hold the data
@@ -175,7 +178,7 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    for (int i=0; i <= bins_sum.size(); i++) {
       if (bins_count[i]>0) {
          if (i*bin_width < smallest_dimension/2.0) {
-            cout << bins_count[i] << endl;
+//            cout << bins_count[i] << endl;
             of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << bins_std_dev[i] << "\n";
          }
       }
