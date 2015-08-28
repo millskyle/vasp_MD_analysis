@@ -3,9 +3,11 @@
 
 #include <string>
 #include <map>
+#include <algorithm>
 #include <vector>
 #include <string.h>
 #include <cmath>
+#include <regex>
 #include "utility_functions.h"
 #include "screen.h"
 
@@ -262,33 +264,60 @@ struct atomfilter {
    atomSet atoms;
    vector<int> filter_indices;
 
-   int execute_filter() {
+   int execute_filter(FileInfo& vasprun) {
       if (filter_type == "index_range") {
+         //split the string on commas to get the ranges in separate elements
          vector<string> ranges = str2vec(criteria,",");
+         //for each range
          for (int i=0; i < ranges.size(); i++) {
+            //split each range now on a colon, denoting the
             vector<string> thisRange = str2vec(ranges[i], ":");
+            //get the starting/ending indices
             int sind = stoi(thisRange[0]);
             int eind = stoi(thisRange[1]);
-
-            if (sind <= eind) {
-               cout << sind << " to " << eind << endl;
+            //make sure that the starting index is smaller than (or equal to) the ending index
+            if (sind > eind) {
+               screen.error << "INVALID FILTER INDICES. Start index must be less than or equal to end index";
+            } else {
                for (int jj=sind; jj<=eind; jj++) {
                   filter_indices.push_back(jj);
                }
-            } else {
-               screen.error << "INVALID FILTER INDICES. Start index must be less than or equal to end index";
             }
          }
+      
+      } else if ( filter_type == "symbol" ) {
+         //split the criteria string up on spaces or commas
+         vector<string> desiredSymbols = str2vec(criteria, ", ");
+         //for each symbol in the specified filter symbols
+         for (int s=0; s<desiredSymbols.size(); s++) {
+            //for each ion in the datafile
+            for (int i = 0; i < vasprun.ion_symbols.size(); i++ ) {
+               //if the ion is of the desired type, add its index to the list
+               if (vasprun.ion_symbols[i]==desiredSymbols[s]) {
+                  filter_indices.push_back(i);
+               }
+            }
+         }
+      } else if ( filter_type == "index" || filter_type == "indices" ) {
+         //split the criteria string up on spaces or commas
+         vector<string> desiredIndices = str2vec(criteria, ", ");
+         for (int i=0; i < desiredIndices.size(); i++) {
+            filter_indices.push_back( stoi(rtrim(ltrim(desiredIndices[i]))));
+         }
+      }
+
+
+
+         
          sort(filter_indices.begin(), filter_indices.end() );
          for (int i=0;i<filter_indices.size(); i++) {
             cout << filter_indices[i] << " " ;
          }
          cout << endl; 
 
-         
+        return 0; 
       }
-   return 0;
-}
+
 
 
 /*

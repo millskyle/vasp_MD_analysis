@@ -52,8 +52,39 @@ plots:
   force_field_atoms: 'Al'
   force_field_resolution: 15
 
+#----------------------------------------------------------------#
+# FILTERS
+#----------------------------------------------------------------#
+# Define subsets of atoms, filters essentially. Give each a name, a type and a criteria, like so:
+      #atom_sets:
+      #   - name: 'forces1'
+      #     filter_type: "index_range"
+      #     criteria: "101:127,0:100"
+      #
+      #  - name: 'forces2'
+      #    filter_type: "symbol"
+      #    criteria: "Al,B N "
+      #
+      #  - name: 'forces3'
+      #    filter_type: "index"
+      #    criteria: "1,2,3,4,9,10,11,13,16,17,128,130"
+#
+# - name: can be any string, which you will reference above when specifying sets for each plot
+
+#  filter_type:  'index_range' ::: criteria specifies (a) range(s) of atom indices.  
+#                                  Start and end indices are delimited by a colon.
+#                                  Multiple ranges are delimited by a comma
+   
+
+#  filter_type: 'symbol' :::       criteria specifies (an) atomic symbol(s).
+#                                  List may be delimited by a comma, space or both.
+
+#  filter_type: 'index'  :::       criteria specifies all indices which to select.
+#        (or 'indices')  :::       List may be comma or space delimited
+#            
 
 
+       
 
 atom_sets:
   - name: 'forces1'
@@ -62,7 +93,11 @@ atom_sets:
 
   - name: 'forces2'
     filter_type: "symbol"
-    criteria: "Al "
+    criteria: "Al,B N "
+
+  - name: 'forces3'
+    filter_type: "indices"
+
 
 
   
