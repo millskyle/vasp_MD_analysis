@@ -263,7 +263,15 @@ struct atomfilter {
    string criteria;
    atomSet atoms;
    vector<int> filter_indices;
+   
+   atomType* return_atoms() {
+      return &atoms.atoms;
+   }
 
+   //////////////
+   // Funtion to execute the filter, filling the atoms object specified a couple of lines above with only
+   // the atoms that are included in the filter.  This function called from main.cpp after file parsing done.
+   //////////////
    int execute_filter(FileInfo& vasprun) {
       if (filter_type == "index_range") {
          //split the string on commas to get the ranges in separate elements
@@ -305,57 +313,42 @@ struct atomfilter {
             filter_indices.push_back( stoi(rtrim(ltrim(desiredIndices[i]))));
          }
       }
-
-
-
-         
-         sort(filter_indices.begin(), filter_indices.end() );
-         for (int i=0;i<filter_indices.size(); i++) {
-            cout << filter_indices[i] << " " ;
-         }
-         cout << endl; 
-
-        return 0; 
+   
+      //sort the vector by index.
+      sort(filter_indices.begin(), filter_indices.end() );
+   
+   
+      //Now we need to take the vector of indices to include and actually filter the timestep data
+    
+      ///////
+      //Fill a vector with the symbols of the atoms contained in the filter
+      vector<string> filtered_symbols;
+      for (int i=0; i<filter_indices.size(); i++ ) {
+         filtered_symbols.push_back(vasprun.ion_symbols[i]);
       }
+      ///////
 
 
-
-/*
-   atomType GetAtomByIndex(int sID, int eID) {
-      atomType filtered;
+      ///////
+      //Fill the atomType object with time-dependent data
+      atomType filtered_atoms;
       vector<TimeStep> alltimes;
-      for (unsigned t=0;t<ntimesteps-1; t++) {
+      for (unsigned t=0; t<vasprun.ntimesteps; t++) {
          TimeStep ts;
-         for (unsigned i=sID; i<=eID; i++)  {
-            ts.ppp.push_back(  allatoms.timesteps[t].ppp[i]  );
-            ts.fff.push_back(  allatoms.timesteps[t].fff[i]  );
+         for (int i=0; i<filter_indices.size(); i++ ) {
+            ts.ppp.push_back( vasprun.allatoms.timesteps[t].ppp[i]) ;
+            ts.fff.push_back( vasprun.allatoms.timesteps[t].fff[i]) ;
          }
          alltimes.push_back(ts);
       }
-      filtered.timesteps = alltimes;
-      return filtered;
+      filtered_atoms.timesteps = alltimes;
+  
+      //update the filter.
+      atoms.symbols = filtered_symbols;
+      atoms.atoms = filtered_atoms;
+
+      return 0; 
    }
- 
-
-
-*/
-     
-/*
-
-
-
-      } else if (filter_type == "symbol") {
-      
-      } else if (filter_type == "indices") {
-
-
-      } 
-
-
-   }
-*/
-
-
 
 };
 
@@ -398,6 +391,9 @@ struct Configuration {
    int forces_from_eID;
    int forces_to_sID;
    int forces_to_eID;
+
+   string forces_set_1;
+   string forces_set_2;
 
    vector<string> filter_name_list;
 

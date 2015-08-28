@@ -21,6 +21,8 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    gnuplot.command("set yrange [-1:]");
 
 
+
+/*
    atomType* atomobject0;
    atomType* atomobject1; 
    atomType temporary0;
@@ -39,6 +41,27 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    atomobject0 = &temporary0;
    atomobject1 = &temporary1;
 
+   */
+
+
+//   atomType* atomobject0;
+//   atomType* atomobject1;
+
+   atomType temporary0;
+   atomType temporary1;
+
+//   temporary0 = config->atomfilters[config->forces_set_1].atoms.atoms;
+//   temporary1 = config->atomfilters[config->forces_set_2].atoms.atoms;
+
+//   atomobject0 = &temporary0;
+
+   atomType* atomobject0 = (config->atomfilters[config->forces_set_1].return_atoms());
+   atomType* atomobject1 = (config->atomfilters[config->forces_set_2].return_atoms());
+
+   cout << "HERE" << endl;
+
+   cout << atomobject1 << endl;;
+
    double dx,dy,dz,fx0,fy0,fz0,fx1,fy1,fz1; //components of the vectors between atoms
    double proj0, proj1; //scalar projections
    double distance, total_proj;
@@ -46,10 +69,15 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    vector<double> thisdata;
    double max_distance=0;
    double min_distance=100000000;
-   int number_of_projections = 2*atomobject1->timesteps[0].ppp.size()*atomobject0->timesteps[0].ppp.size()*(atomobject1->timesteps.size()-2);
 
+
+   cout << atomobject1->timesteps[0].ppp.size() << endl;
+   cout << atomobject0->timesteps[0].ppp.size() << endl;
+   cout << atomobject1->timesteps.size() << endl;
+   int number_of_projections = 2*atomobject1->timesteps[0].ppp.size()*atomobject0->timesteps[0].ppp.size()*(atomobject1->timesteps.size()-2);
    double all_data_array [number_of_projections][2];
 
+   cout << "HERE" << endl;
 
    screen.step << "Beginning force projection."; 
 

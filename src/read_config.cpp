@@ -89,13 +89,13 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "forces_from_eID", config.forces_from_eID);
    parse(plots, "forces_to_sID", config.forces_to_sID);
    parse(plots, "forces_to_eID", config.forces_to_eID);
+   parse(plots, "forces_set_1", config.forces_set_1);
+   parse(plots, "forces_set_2", config.forces_set_1);
+
 
    config.atomfilters = parse_atom_selections(config, node );
    
 
-   cout << "filters" << endl;
-   cout << config.atomfilters["force_projection_start"].name << config.atomfilters["force_projection_start"].criteria << endl;
-   cout << "Filters" << endl;
 
 }
 

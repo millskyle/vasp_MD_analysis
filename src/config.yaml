@@ -34,8 +34,8 @@ plots:
   #    index:  selects atoms with indices between forces_from_sID and forces_from_eID 
   #    type: selects atoms whose type (element symbol) is in forces_from_atom
 
-  force_set_1: 'forces1'
-  force_set_2: 'forces2'
+  forces_set_1: 'forces1'
+  forces_set_2: 'forces2'
 
   forces_select: "index" 
   forces_from_sID: 64
@@ -97,7 +97,7 @@ atom_sets:
 
   - name: 'forces3'
     filter_type: "indices"
-
+    criteria: "1,2,3,4,5,90,95,20"
 
 
   
