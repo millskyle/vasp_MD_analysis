@@ -99,7 +99,7 @@ int readXML(FileInfo *vasprun) {
    string symbol;
    for (xpath_node_set::const_iterator it = ns_ionlist.begin(); it != ns_ionlist.end(); ++it) {
       symbol=it->node().child("c").child_value();
-      vasprun->ion_symbols.push_back( symbol );
+      vasprun->ion_symbols.push_back( ltrim(rtrim(symbol)) );
 //      cout << counter  << "    " <<  symbol <<  endl;
       counter++;
    }
