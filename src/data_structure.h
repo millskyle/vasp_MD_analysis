@@ -261,6 +261,7 @@ struct atomfilter {
    string name;
    string filter_type;
    string criteria;
+   vector<atomType> att;
    atomSet atoms;
    vector<int> filter_indices;
    
@@ -272,7 +273,7 @@ struct atomfilter {
    // Funtion to execute the filter, filling the atoms object specified a couple of lines above with only
    // the atoms that are included in the filter.  This function called from main.cpp after file parsing done.
    //////////////
-   int execute_filter(FileInfo& vasprun) {
+   int execute_filter(FileInfo* vasprun, atomfilter) {
       if (filter_type == "index_range") {
          //split the string on commas to get the ranges in separate elements
          vector<string> ranges = str2vec(criteria,",");
@@ -299,9 +300,9 @@ struct atomfilter {
          //for each symbol in the specified filter symbols
          for (int s=0; s<desiredSymbols.size(); s++) {
             //for each ion in the datafile
-            for (int i = 0; i < vasprun.ion_symbols.size(); i++ ) {
+            for (int i = 0; i < vasprun->ion_symbols.size(); i++ ) {
                //if the ion is of the desired type, add its index to the list
-               if (vasprun.ion_symbols[i]==desiredSymbols[s]) {
+               if (vasprun->ion_symbols[i]==desiredSymbols[s]) {
                   filter_indices.push_back(i);
                }
             }
@@ -324,7 +325,7 @@ struct atomfilter {
       //Fill a vector with the symbols of the atoms contained in the filter
       vector<string> filtered_symbols;
       for (int i=0; i<filter_indices.size(); i++ ) {
-         filtered_symbols.push_back(vasprun.ion_symbols[i]);
+         filtered_symbols.push_back(vasprun->ion_symbols[i]);
       }
       ///////
 
@@ -333,20 +334,21 @@ struct atomfilter {
       //Fill the atomType object with time-dependent data
       atomType filtered_atoms;
       vector<TimeStep> alltimes;
-      for (unsigned t=0; t<vasprun.ntimesteps; t++) {
+      for (unsigned t=0; t<vasprun->ntimesteps; t++) {
          TimeStep ts;
          for (int i=0; i<filter_indices.size(); i++ ) {
-            ts.ppp.push_back( vasprun.allatoms.timesteps[t].ppp[i]) ;
-            ts.fff.push_back( vasprun.allatoms.timesteps[t].fff[i]) ;
+            ts.ppp.push_back( vasprun->allatoms.timesteps[t].ppp[i]) ;
+            ts.fff.push_back( vasprun->allatoms.timesteps[t].fff[i]) ;
          }
          alltimes.push_back(ts);
       }
       filtered_atoms.timesteps = alltimes;
+
   
       //update the filter.
       atoms.symbols = filtered_symbols;
       atoms.atoms = filtered_atoms;
-
+      
       return 0; 
    }
 
@@ -413,6 +415,29 @@ struct Configuration {
    
 } config;
    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 struct GnuPlotScript {

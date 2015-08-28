@@ -20,47 +20,12 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
 
    gnuplot.command("set yrange [-1:]");
 
+   atomType atomobject0 = config->atomfilters[config->forces_set_1].atoms.atoms;
+   atomType atomobject1 = config->atomfilters[config->forces_set_2].atoms.atoms;
 
-
-/*
-   atomType* atomobject0;
-   atomType* atomobject1; 
-   atomType temporary0;
-   atomType temporary1;
-
-   if (config->forces_select == "type") {
-      temporary0 = *(vasprun->GetAtom(config->forces_from_atom));
-      temporary1 = *(vasprun->GetAtom(config->forces_to_atom));
-   } else if (config->forces_select == "index" ) {
-      temporary0 = vasprun->GetAtomByIndex(config->forces_from_sID, config->forces_from_eID);
-      temporary1 = vasprun->GetAtomByIndex(config->forces_to_sID, config->forces_to_eID);
-//      atomobject1 = *temporary;
-   }
-
-
-   atomobject0 = &temporary0;
-   atomobject1 = &temporary1;
-
-   */
-
-
-//   atomType* atomobject0;
-//   atomType* atomobject1;
-
-   atomType temporary0;
-   atomType temporary1;
-
-//   temporary0 = config->atomfilters[config->forces_set_1].atoms.atoms;
-//   temporary1 = config->atomfilters[config->forces_set_2].atoms.atoms;
-
-//   atomobject0 = &temporary0;
-
-   atomType* atomobject0 = (config->atomfilters[config->forces_set_1].return_atoms());
-   atomType* atomobject1 = (config->atomfilters[config->forces_set_2].return_atoms());
 
    cout << "HERE" << endl;
 
-   cout << atomobject1 << endl;;
 
    double dx,dy,dz,fx0,fy0,fz0,fx1,fy1,fz1; //components of the vectors between atoms
    double proj0, proj1; //scalar projections
@@ -70,11 +35,15 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    double max_distance=0;
    double min_distance=100000000;
 
+   
 
-   cout << atomobject1->timesteps[0].ppp.size() << endl;
-   cout << atomobject0->timesteps[0].ppp.size() << endl;
-   cout << atomobject1->timesteps.size() << endl;
-   int number_of_projections = 2*atomobject1->timesteps[0].ppp.size()*atomobject0->timesteps[0].ppp.size()*(atomobject1->timesteps.size()-2);
+   cout << atomobject1.timesteps.size() << endl;
+   cout << atomobject1.timesteps[0].ppp.size() << endl;
+   cout << atomobject0.timesteps[0].ppp.size() << endl;
+
+
+
+   int number_of_projections = 2*atomobject1.timesteps[0].ppp.size()*atomobject0.timesteps[0].ppp.size()*(atomobject1.timesteps.size()-2);
    double all_data_array [number_of_projections][2];
 
    cout << "HERE" << endl;
@@ -82,11 +51,11 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    screen.step << "Beginning force projection."; 
 
    screen.data("Projections"," 2 orientations x " 
-         + to_string(atomobject0->timesteps[0].ppp.size())  
+         + to_string(atomobject0.timesteps[0].ppp.size())  
          + " atoms x "  
-         + to_string(atomobject1->timesteps[0].ppp.size()) 
+         + to_string(atomobject1.timesteps[0].ppp.size()) 
          +  " atoms x " 
-         + to_string((atomobject1->timesteps.size()-2)) 
+         + to_string((atomobject1.timesteps.size()-2)) 
          +  " timesteps = "
          + to_string(number_of_projections)
          + " projections"
@@ -95,13 +64,13 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    int counter=0;
 
 
-   for (int t=0; t < atomobject1->timesteps.size()-2; t++ ) {   // -2 as the last timestep could be incomplete
-      for (int a=0; a<atomobject1->timesteps[0].ppp.size(); a++) {
-         for (int b=0; b<atomobject0->timesteps[0].ppp.size(); b++) {
+   for (int t=0; t < atomobject1.timesteps.size()-2; t++ ) {   // -2 as the last timestep could be incomplete
+      for (int a=0; a<atomobject1.timesteps[0].ppp.size(); a++) {
+         for (int b=0; b<atomobject0.timesteps[0].ppp.size(); b++) {
             //vector between the two atoms
-            dx = atomobject0->timesteps[t].ppp[b][0] - atomobject1->timesteps[t].ppp[a][0];
-            dy = atomobject0->timesteps[t].ppp[b][1] - atomobject1->timesteps[t].ppp[a][1];
-            dz = atomobject0->timesteps[t].ppp[b][2] - atomobject1->timesteps[t].ppp[a][2];
+            dx = atomobject0.timesteps[t].ppp[b][0] - atomobject1.timesteps[t].ppp[a][0];
+            dy = atomobject0.timesteps[t].ppp[b][1] - atomobject1.timesteps[t].ppp[a][1];
+            dz = atomobject0.timesteps[t].ppp[b][2] - atomobject1.timesteps[t].ppp[a][2];
             //minimum image correction:
             dx = dx - nint(dx / vasprun->latt[0][0])*vasprun->latt[0][0];
             dy = dy - nint(dy / vasprun->latt[1][1])*vasprun->latt[1][1];
@@ -115,12 +84,12 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
             //if (distance < min_distance) { min_distance = distance; }
 
             //get the forces from the atom objects
-            fx0 = atomobject0->timesteps[t].fff[b][0];
-            fy0 = atomobject0->timesteps[t].fff[b][1];
-            fz0 = atomobject0->timesteps[t].fff[b][2];
-            fx1 = atomobject1->timesteps[t].fff[a][0];
-            fy1 = atomobject1->timesteps[t].fff[a][1];
-            fz1 = atomobject1->timesteps[t].fff[a][2];
+            fx0 = atomobject0.timesteps[t].fff[b][0];
+            fy0 = atomobject0.timesteps[t].fff[b][1];
+            fz0 = atomobject0.timesteps[t].fff[b][2];
+            fx1 = atomobject1.timesteps[t].fff[a][0];
+            fy1 = atomobject1.timesteps[t].fff[a][1];
+            fz1 = atomobject1.timesteps[t].fff[a][2];
            
             //project them
             // (F dot r) / |r|
