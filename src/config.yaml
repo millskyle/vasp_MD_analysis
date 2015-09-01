@@ -4,9 +4,10 @@ files:
 
 
 plots:
-  msd: False
+  msd: True 
   msd_data_prefix: "msd_"
-  msd_atoms: 'Al   '
+  msd_reference_D: 4e-9 #diffusion coefficient to plot alongside data (for reference)
+  msd_filter: 'liquidal'
 
   rdf: False
   rdf_data_prefix: "rdf_"
@@ -34,7 +35,7 @@ plots:
   #    index:  selects atoms with indices between forces_from_sID and forces_from_eID 
   #    type: selects atoms whose type (element symbol) is in forces_from_atom
 
-  forces_set_1: 'forces1'
+  forces_set_1: 'liquidal'
   forces_set_2: 'forces2'
   forces_bins: 300
 
@@ -70,7 +71,7 @@ plots:
 #            
 
 atom_sets:
-  - name: 'forces1'
+  - name: 'liquidal'
     filter_type: "index_range"
     criteria: "128:427"
 

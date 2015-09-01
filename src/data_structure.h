@@ -72,6 +72,7 @@ struct atomType {
    int atomspertype, sindex, eindex;
    string element,pseudopotential;
    double mass, valence;
+   vector<string> symbols;
    vector<TimeStep> timesteps; //holds all time dependent data
    bool COM_already=false;
    atomType () {
@@ -211,37 +212,6 @@ struct VasprunXML {
    }
 
 
-   int calculate_COM(atomType *atoms) {
-      if (atoms->COM_already) {return 0;}
-      
-      cout << "Mass: " << atoms->mass;
-      double atomTotalMass = atoms->mass * atoms->atomspertype;
-      double COMx,COMy,COMz = 0;
-      for (unsigned t=0; t < atoms->timesteps.size(); t++) { //for each timestep
-         COMx = 0;
-         COMy = 0;
-         COMz = 0;
-            vector<threevector> &r = atoms->timesteps[t].ppp_uw;
-            for (unsigned a=0; a<r.size(); a++) { //for atom in ppp vector
-               COMx +=  (atoms->mass * r[a][0]);
-               COMy +=  (atoms->mass * r[a][1]);
-               COMz +=  (atoms->mass * r[a][2]);
-               
-            }
-         atoms->timesteps[t].COM[0] = COMx / atomTotalMass;
-         atoms->timesteps[t].COM[1] = COMy / atomTotalMass;
-         atoms->timesteps[t].COM[2] = COMz / atomTotalMass;
-
-      }
-      atoms->COM_already=true;
-
-//print it out to check:
-
-
-   return 0;
-
-
-   }
 
 
    VasprunXML() {
@@ -263,6 +233,48 @@ eparation distance [Angstrom]
    }
 };
 
+
+int calculate_COM(atomType *atoms, VasprunXML *vasprun) {
+   if (atoms->COM_already) {return 0;}
+   
+
+   double atomTotalMass = 0;
+   double COMx,COMy,COMz = 0;
+
+   cout << "HERE" << atoms->timesteps.size() << endl;
+
+   for (unsigned a=0; a<atoms->timesteps[0].ppp.size(); a++) {
+      cout << vasprun->atomic_mass[atoms->symbols[a]] << endl;
+      atomTotalMass+=vasprun->atomic_mass[atoms->symbols[a]];
+   }
+
+
+
+   for (unsigned t=0; t < atoms->timesteps.size(); t++) { //for each timestep
+      COMx = 0;
+      COMy = 0;
+      COMz = 0;
+         vector<threevector> &r = atoms->timesteps[t].ppp_uw;
+         for (unsigned a=0; a<r.size(); a++) { //for atom in ppp vector
+            COMx +=  (vasprun->atomic_mass[atoms->symbols[a]] * r[a][0]);
+            COMy +=  (vasprun->atomic_mass[atoms->symbols[a]] * r[a][1]);
+            COMz +=  (vasprun->atomic_mass[atoms->symbols[a]] * r[a][2]);
+            
+         }
+      atoms->timesteps[t].COM[0] = COMx / atomTotalMass;
+      atoms->timesteps[t].COM[1] = COMy / atomTotalMass;
+      atoms->timesteps[t].COM[2] = COMz / atomTotalMass;
+
+   }
+   atoms->COM_already=true;
+
+//print it out to check:
+
+
+return 0;
+
+
+}
 
 struct atomfilter {
    string name;
@@ -348,11 +360,13 @@ struct atomfilter {
          alltimes.push_back(ts);
       }
       filtered_atoms.timesteps = alltimes;
+      filtered_atoms.symbols = filtered_symbols;
 
   
       //update the filter.
       atoms.symbols = filtered_symbols;
       atoms.atoms = filtered_atoms;
+
      
       return 0; 
    }
@@ -367,6 +381,7 @@ struct Configuration {
    bool msd;
    string msd_data_prefix;
    string msd_filter;
+   double msd_reference_D;
 
    bool rho;
    string rho_data_prefix;

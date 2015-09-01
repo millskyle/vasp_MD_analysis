@@ -54,6 +54,7 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "msd", config.msd);
    parse(plots, "msd_data_prefix", config.msd_data_prefix);
    parse(plots, "msd_filter", config.msd_filter);
+   parse(plots, "msd_reference_D", config.msd_reference_D);
     
    parse(plots, "rdf", config.rdf);
    parse(plots, "rdf_data_prefix", config.rdf_data_prefix);
