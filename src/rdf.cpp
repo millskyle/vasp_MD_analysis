@@ -8,7 +8,7 @@
 } */
 
 
-int radial_distribution_function(FileInfo *vasprun, Configuration *config) {
+int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
    if (!config->rdf) {cout << "\nRDF called but not requested in configuration. Exiting"; return 1;}
 
    screen.status << "Radial Distribution Function";

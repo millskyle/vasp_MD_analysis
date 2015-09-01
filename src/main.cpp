@@ -16,7 +16,7 @@ using namespace std;
 
 int main() {
    cout << BOLDRED << "WELCOME!!!" << RESET << "\n";
-   FileInfo v;
+   VasprunXML v;
    Configuration config;
    read_configfile(config);
 
