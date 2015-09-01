@@ -6,7 +6,7 @@
 
 Conversions converter;
 
-int global_density(FileInfo *vasprun, Configuration *config) {
+int global_density(VasprunXML *vasprun, Configuration *config) {
    if (!config->rho) {cout << "\nDensity function called but not requested in configuration. Exiting"; return 1;}
 
    screen.status << "Density calculations" ;

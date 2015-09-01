@@ -3,7 +3,7 @@
 
 #include "data_structure.h"
 
-int spatial_distribution_projection(FileInfo *vasprun, Configuration *config) {
+int spatial_distribution_projection(VasprunXML *vasprun, Configuration *config) {
    if (!config->spatial_distribution_projection) {cout << "\nSpatial Distribution called but not requested in configuration. Exiting"; return 1;}
 
    screen.status <<  "Spatial Distribution projected onto plane";

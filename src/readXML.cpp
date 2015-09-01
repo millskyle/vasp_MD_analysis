@@ -28,7 +28,7 @@ bool update_3d_vector(vector<threevector>* objectToUpdate, float x, float y, flo
    return true;
 }
 
-int readXML(FileInfo *vasprun) {
+int readXML(VasprunXML *vasprun) {
    float x, y, z;
    vector<float> r;
 
@@ -192,6 +192,9 @@ int readXML(FileInfo *vasprun) {
 
    screen.status << "Unwrapping coordinates";
    vasprun->unwrap();
+   vasprun->unwrap_atomType(&vasprun->allatoms);
+   
+
    screen.status << "Weighing the system";
    vasprun->mass_system(); //"weigh" the system.
 
@@ -226,7 +229,7 @@ int readXML(FileInfo *vasprun) {
 
 /* int main() {
    cout << "\n Starting XML read"<<endl;
-   FileInfo v;
+   VasprunXML v;
    v.input_filename="vasprun.xml";
    readXML(&v);
    cout << "\n done"<<endl;

@@ -16,7 +16,7 @@ using namespace std;
 
 int main() {
    cout << BOLDRED << "WELCOME!!!" << RESET << "\n";
-   FileInfo v;
+   VasprunXML v;
    Configuration config;
    read_configfile(config);
 
@@ -29,6 +29,7 @@ int main() {
    } else {
       screen.finished << "Successfully read XML file";
    }
+
 
    screen.section << "CREATING ATOM SUBSETS";
    for (int i=0; i<config.filter_name_list.size(); i++) {

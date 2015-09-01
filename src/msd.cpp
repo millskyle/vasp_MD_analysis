@@ -6,7 +6,7 @@
 
 Conversions convert;
 
-int mean_square_displacement(FileInfo *vasprun, Configuration *config) {
+int mean_square_displacement(VasprunXML *vasprun, Configuration *config) {
    if (!config->msd) {cout << "\nMSD called but not requested in configuration. Exiting"; return 1;}
    
    screen.status << "Mean Squared Displacement";

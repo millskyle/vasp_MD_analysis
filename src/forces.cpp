@@ -7,7 +7,7 @@
 
 
 
-int force_bond_projections(FileInfo *vasprun, Configuration *config) {
+int force_bond_projections(VasprunXML *vasprun, Configuration *config) {
    if (!config->forces) {cout << "\nForce projection called but not requested in configuration. Exiting"; return 1;}   
    screen.status << "Force Projections";
    screen.step << "Bond force projections requested based on " + config->forces_select + "."; 

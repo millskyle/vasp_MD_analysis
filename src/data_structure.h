@@ -86,7 +86,7 @@ struct atomSet {
 };
 
 
-struct FileInfo {
+struct VasprunXML {
    //File input/output parameters
    string input_filename,output_data_location,system_name;
    INCAR incar;
@@ -237,7 +237,7 @@ struct FileInfo {
    }
 
 
-   FileInfo() {
+   VasprunXML() {
       numatoms=0;
       input_filename = "/tmp/garbage";
       output_data_location = "/tmp/";
@@ -269,7 +269,7 @@ struct atomfilter {
    // Funtion to execute the filter, filling the atoms object specified a couple of lines above with only
    // the atoms that are included in the filter.  This function called from main.cpp after file parsing done.
    //////////////
-   int execute_filter(FileInfo* vasprun) {
+   int execute_filter(VasprunXML* vasprun) {
       if (filter_type == "index_range") {
          //split the string on commas to get the ranges in separate elements
          vector<string> ranges = str2vec(criteria,",");
