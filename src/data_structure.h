@@ -91,6 +91,7 @@ struct VasprunXML {
    string input_filename,output_data_location,system_name;
    INCAR incar;
    //File data structures
+   map <string, double> atomic_mass;
    int numatoms,numtypes,ntimesteps;
    bool unwrapped_already=false;
    vector<int> atom_count;
@@ -213,9 +214,10 @@ struct VasprunXML {
    int calculate_COM(atomType *atoms) {
       if (atoms->COM_already) {return 0;}
       
+      cout << "Mass: " << atoms->mass;
       double atomTotalMass = atoms->mass * atoms->atomspertype;
       double COMx,COMy,COMz = 0;
-      for (unsigned t=0; t < ntimesteps-1; t++) { //for each timestep
+      for (unsigned t=0; t < atoms->timesteps.size(); t++) { //for each timestep
          COMx = 0;
          COMy = 0;
          COMz = 0;

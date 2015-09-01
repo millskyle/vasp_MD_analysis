@@ -83,6 +83,7 @@ int readXML(VasprunXML *vasprun) {
       atomTypeData.element         = trim(it->node().child("c").next_sibling().child_value());
       atomTypeData.mass            = stod(it->node().child("c")\
                                    .next_sibling().next_sibling().child_value() );
+      vasprun->atomic_mass[atomTypeData.element] = atomTypeData.mass;
       atomTypeData.valence         = stod(it->node().child("c").next_sibling()\
                                    .next_sibling().next_sibling().child_value() ); 
       atomTypeData.pseudopotential = it->node().child("c").next_sibling().next_sibling()\
