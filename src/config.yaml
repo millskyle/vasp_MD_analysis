@@ -9,9 +9,9 @@ plots:
   msd_reference_D: 4e-9 #diffusion coefficient to plot alongside data (for reference)
   msd_filter: 'liquidal'
 
-  rdf: False
+  rdf: True
   rdf_data_prefix: "rdf_"
-  rdf_atoms: 'Al '
+  rdf_filter: 'liquidal'
   rdf_bins: 500
   rdf_cut_half_lv: True
   rdf_plot_type: "lines"

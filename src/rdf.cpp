@@ -12,9 +12,7 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
    if (!config->rdf) {cout << "\nRDF called but not requested in configuration. Exiting"; return 1;}
 
    screen.status << "Radial Distribution Function";
-   screen.step   << "RDF requested for " + vec2str(config->rdf_atoms);
-   //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
-   vasprun->unwrap(); 
+//   screen.step   << "RDF requested for " + vec2str(config->rdf_atoms);
    
    //Start a simple bash script which calls GNUplot to plot the msd data
 
@@ -31,10 +29,12 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
       }
    }
 
+   
+
    //For each atom in the requested atom types
-   for (int atomname=0; atomname < config->rdf_atoms.size(); atomname++) {
+//   for (int atomname=0; atomname < config->rdf_atoms.size(); atomname++) {
       //this pointer will point to the atomType object for this type of atom 
-      atomType* atomobject = vasprun->GetAtom(config->rdf_atoms[atomname]);
+      atomType* atomobject = &(config->atomfilters[config->rdf_filter].atoms.atoms);
       screen.step << "Beginning RDF calculation for " + atomobject->element;
       
       double rdf_sum=0; //the aggregate sum of of the displacements in the  timestep
@@ -59,7 +59,7 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
       double xmax,ymax,zmax;
       double sum_volume = 0;
       //for each timestep which we have positions for
-      for (int t=1; t < atomobject->timesteps.size()-2; t++ ) {
+      for (int t=1; t < atomobject->timesteps.size(); t++ ) {
          xmin = 1e10;
          ymin = 1e10;
          zmin = 1e10;
@@ -67,7 +67,7 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
          ymax = 0;
          zmax = 0;
          //for each atom in the position vector of vectors
-         for (int a=0; a<atomobject->atomspertype-1; a++) {
+         for (int a=0; a<atomobject->timesteps[0].ppp.size(); a++) {
             xa = atomobject->timesteps[t].ppp[a][0];
             ya = atomobject->timesteps[t].ppp[a][1];
             za = atomobject->timesteps[t].ppp[a][2];
@@ -79,7 +79,7 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
             if (ya < ymin) {ymin = ya;}
             if (za < zmin) {zmin = za;}
 
-            for (int b=a+1; b<atomobject->atomspertype-1; b++ ) {
+            for (int b=a+1; b<atomobject->timesteps[0].ppp.size(); b++ ) {
                xb = atomobject->timesteps[t].ppp[b][0];
                yb = atomobject->timesteps[t].ppp[b][1];
                zb = atomobject->timesteps[t].ppp[b][2];
@@ -116,7 +116,7 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
          + " lw 3 , "
          , false);
 
-      double atomic_density = atomobject->atomspertype / (sum_volume/atomobject->timesteps.size());
+      double atomic_density = atomobject->timesteps[0].ppp.size() / (sum_volume/atomobject->timesteps.size());
       //write each timestep to a file
       for (int n=0; n < nbins-1; n++) {
          double normalization = atomic_density / (4*3.14159264*bin_cutoff[n]*bin_cutoff[n]*bin_width*atomobject->timesteps.size() );
@@ -124,7 +124,7 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
       }
       of.close();
 
-   }
+  // }
 
    //Close off the GNUPlot script
    gnuplot.close();

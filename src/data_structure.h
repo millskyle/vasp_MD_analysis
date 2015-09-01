@@ -241,10 +241,8 @@ int calculate_COM(atomType *atoms, VasprunXML *vasprun) {
    double atomTotalMass = 0;
    double COMx,COMy,COMz = 0;
 
-   cout << "HERE" << atoms->timesteps.size() << endl;
 
    for (unsigned a=0; a<atoms->timesteps[0].ppp.size(); a++) {
-      cout << vasprun->atomic_mass[atoms->symbols[a]] << endl;
       atomTotalMass+=vasprun->atomic_mass[atoms->symbols[a]];
    }
 
