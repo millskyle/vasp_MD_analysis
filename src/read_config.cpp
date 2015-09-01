@@ -79,15 +79,7 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "nbins_y", config.nbins_y);
 
    parse(plots, "forces", config.forces);
-   parse(plots, "forces_from_atom",config.forces_from_atom);
-   parse(plots, "forces_to_atom", config.forces_to_atom);
    parse(plots, "forces_bins", config.forces_bins);
-
-   parse(plots, "forces_select",config.forces_select);
-   parse(plots, "forces_from_sID",config.forces_from_sID);
-   parse(plots, "forces_from_eID", config.forces_from_eID);
-   parse(plots, "forces_to_sID", config.forces_to_sID);
-   parse(plots, "forces_to_eID", config.forces_to_eID);
    parse(plots, "forces_set_1", config.forces_set_1);
    parse(plots, "forces_set_2", config.forces_set_2);
 

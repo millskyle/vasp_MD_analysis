@@ -36,21 +36,7 @@ plots:
 
   forces_set_1: 'forces1'
   forces_set_2: 'forces2'
-
-  forces_select: "index" 
-  forces_from_sID: 64
-  forces_from_eID: 127
-  forces_to_sID: 128
-  forces_to_eID: 427
-
- # forces_select: "type"
-  forces_from_atom: 'Al'
-  forces_to_atom: 'N'
-
-
   forces_bins: 300
-  force_field_atoms: 'Al'
-  force_field_resolution: 15
 
 #----------------------------------------------------------------#
 # FILTERS
