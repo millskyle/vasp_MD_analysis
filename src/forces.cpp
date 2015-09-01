@@ -18,8 +18,6 @@ int force_bond_projections(FileInfo *vasprun, Configuration *config) {
    GnuPlotScript gnuplot ;
    gnuplot.initialise("forces","Force","Separation distance [Angstrom]","Average force [eV/Angstrom]","force.pdf");
 
-//   gnuplot.command("set yrange [-1:]");
-
    atomType *atomobject0;
    atomType *atomobject1;
 
