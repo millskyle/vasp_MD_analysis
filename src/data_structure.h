@@ -261,19 +261,15 @@ struct atomfilter {
    string name;
    string filter_type;
    string criteria;
-   vector<atomType> att;
    atomSet atoms;
    vector<int> filter_indices;
    
-   atomType* return_atoms() {
-      return &atoms.atoms;
-   }
 
    //////////////
    // Funtion to execute the filter, filling the atoms object specified a couple of lines above with only
    // the atoms that are included in the filter.  This function called from main.cpp after file parsing done.
    //////////////
-   int execute_filter(FileInfo* vasprun, atomfilter) {
+   int execute_filter(FileInfo* vasprun) {
       if (filter_type == "index_range") {
          //split the string on commas to get the ranges in separate elements
          vector<string> ranges = str2vec(criteria,",");
@@ -337,8 +333,8 @@ struct atomfilter {
       for (unsigned t=0; t<vasprun->ntimesteps; t++) {
          TimeStep ts;
          for (int i=0; i<filter_indices.size(); i++ ) {
-            ts.ppp.push_back( vasprun->allatoms.timesteps[t].ppp[i]) ;
-            ts.fff.push_back( vasprun->allatoms.timesteps[t].fff[i]) ;
+            ts.ppp.push_back( vasprun->allatoms.timesteps[t].ppp[filter_indices[i]]) ;
+            ts.fff.push_back( vasprun->allatoms.timesteps[t].fff[filter_indices[i]]) ;
          }
          alltimes.push_back(ts);
       }
@@ -348,7 +344,11 @@ struct atomfilter {
       //update the filter.
       atoms.symbols = filtered_symbols;
       atoms.atoms = filtered_atoms;
-      
+     
+//      cout << "  timesteps: " << selected.timesteps.size() << endl ;
+//      cout << "  atoms: " << selected.timesteps[0].ppp.size() << endl ;
+
+
       return 0; 
    }
 
