@@ -32,9 +32,9 @@ int radial_distribution_function(FileInfo *vasprun, Configuration *config) {
    }
 
    //For each atom in the requested atom types
-   for (int atomname=0; atomname < config->msd_atoms.size(); atomname++) {
+   for (int atomname=0; atomname < config->rdf_atoms.size(); atomname++) {
       //this pointer will point to the atomType object for this type of atom 
-      atomType* atomobject = vasprun->GetAtom(config->msd_atoms[atomname]);
+      atomType* atomobject = vasprun->GetAtom(config->rdf_atoms[atomname]);
       screen.step << "Beginning RDF calculation for " + atomobject->element;
       
       double rdf_sum=0; //the aggregate sum of of the displacements in the  timestep
