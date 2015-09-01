@@ -24,8 +24,6 @@ int mean_square_displacement(VasprunXML *vasprun, Configuration *config) {
       atomType* atomobject = &(config->atomfilters[config->msd_filter].atoms.atoms);
    
 
-      cout << "timesteps: " << atomobject->timesteps.size() << endl;
-
       //Calculate the center of mass for this atom_type. It'll be stored in the object.
       screen.step << "Calculating center of mass for " + atomobject->element;
       int garbageint = calculate_COM(atomobject,vasprun);

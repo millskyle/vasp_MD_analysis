@@ -396,8 +396,8 @@ struct Configuration {
    int nbins_y;
 
    bool rdf;
+   string rdf_filter;
    string rdf_data_prefix;
-   vector<string> rdf_atoms;
    int rdf_bins;
    bool rdf_cut_half_lv;
    string rdf_plot_type;   
