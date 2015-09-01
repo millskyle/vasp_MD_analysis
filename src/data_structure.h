@@ -335,10 +335,6 @@ struct atomfilter {
       //Fill the atomType object with time-dependent data
       atomType filtered_atoms;
       vector<TimeStep> alltimes;
-      cout << "HERE" << endl;
-      cout << vasprun->allatoms.timesteps.size() << endl;
-      cout << vasprun->allatoms.timesteps[0].ppp_uw.size() << endl;
-      cout << "HERE" << endl;
 
       for (unsigned t=0; t<vasprun->allatoms.timesteps.size(); t++) {
          TimeStep ts;
@@ -346,7 +342,7 @@ struct atomfilter {
 //            cout << t << ":  " <<  filter_indices[i] << endl;
             ts.ppp.push_back( vasprun->allatoms.timesteps[t].ppp[filter_indices[i]]) ;
             ts.fff.push_back( vasprun->allatoms.timesteps[t].fff[filter_indices[i]]) ;
-            ts.ppp_uw.push_back( vasprun->allatoms.timesteps[t].ppp_uw[filter_indices[i]]) ;//vasprun->allatoms.timesteps[t].ppp_uw[filter_indices[i]]) ;
+            ts.ppp_uw.push_back( vasprun->allatoms.timesteps[t].ppp_uw[filter_indices[i]]) ;
          }
          alltimes.push_back(ts);
       }
@@ -357,10 +353,6 @@ struct atomfilter {
       atoms.symbols = filtered_symbols;
       atoms.atoms = filtered_atoms;
      
-//      cout << "  timesteps: " << selected.timesteps.size() << endl ;
-//      cout << "  atoms: " << selected.timesteps[0].ppp.size() << endl ;
-
-
       return 0; 
    }
 
