@@ -10,9 +10,7 @@ int mean_square_displacement(VasprunXML *vasprun, Configuration *config) {
    if (!config->msd) {cout << "\nMSD called but not requested in configuration. Exiting"; return 1;}
    
    screen.status << "Mean Squared Displacement";
-   screen.step << "Requested for " + to_string(config->msd_atoms.size())+ " atom types: " + vec2str(config->msd_atoms);
-   //We need to use unwrapped coordinates.  Unwrap if not already unwrapped.
-   vasprun->unwrap(); 
+//2015-09-01    screen.step << "Requested for " + to_string(config->msd_atoms.size())+ " atom types: " + vec2str(config->msd_atoms);
    
    //Make a gnuplot object.  It takes care of writing the data to a script.
    GnuPlotScript gnuplot ;
@@ -21,9 +19,11 @@ int mean_square_displacement(VasprunXML *vasprun, Configuration *config) {
 
 
    //For each atom in the requested atom types
-   for (int atomname=0; atomname < config->msd_atoms.size(); atomname++) {
+//2015-09-01   for (int atomname=0; atomname < config->msd_atoms.size(); atomname++) {
       //this pointer will point to the atomType object for this type of atom 
-      atomType* atomobject = vasprun->GetAtom(config->msd_atoms[atomname]);
+      atomType* atomobject = &(config->atomfilters[config->msd_filter].atoms.atoms);
+   
+
       //Calculate the center of mass for this atom_type. It'll be stored in the object.
       screen.step << "Calculating center of mass for " + atomobject->element;
       vasprun->calculate_COM(atomobject);
@@ -36,7 +36,7 @@ int mean_square_displacement(VasprunXML *vasprun, Configuration *config) {
       //for each timestep which we have positions for
       for (int t=1; t < atomobject->timesteps.size()-2; t++ ) {
          //for each atom in the position vector of vectors
-         for (int a=0; a<atomobject->atomspertype-1; a++) {
+         for (int a=0; a<atomobject->timesteps[0].ppp.size(); a++) {
                int t2=0; //the timestep to calculate displacement from
                // xdist = r(t) - r(0) - [  COM(t)  - COM(t) ]
                xdist = atomobject->timesteps[t].ppp_uw[a][0] - atomobject->timesteps[t2].ppp_uw[a][0]
@@ -111,7 +111,7 @@ int mean_square_displacement(VasprunXML *vasprun, Configuration *config) {
    of.close();
 
    
-}
+//2015-09-01  }
 
    gnuplot.close();
    //add a command to the global plot script to make the msd plots

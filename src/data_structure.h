@@ -161,33 +161,39 @@ struct VasprunXML {
    }
 
 
-   int unwrap() {
+   int unwrap_atomType(atomType *atoms) {
+      //Copy the position vectors
       int sign;
-      if (unwrapped_already) {return 0;}
-
-      //copy the position vectors
-      for (unsigned i=0; i<atoms.size(); i++) {  // for each atom type
-         for (unsigned t=0; t < ntimesteps-1; t++) { //for each timestep
-            atoms[i].timesteps[t].ppp_uw = atoms[i].timesteps[t].ppp;
-         }
+      screen.step << "unwrapping...";
+      for (unsigned t=0; t < atoms->timesteps.size(); t++) {
+         atoms->timesteps[t].ppp_uw = atoms->timesteps[t].ppp;
       }
-      for (unsigned i=0; i<atoms.size(); i++) {  // for each atom type
-         for (unsigned t=1; t < ntimesteps-1; t++) { //for each timestep
-//            cout << "t=" <<  t << "\n";
-//            atoms[i].timesteps[t].ppp_uw = atoms[i].timesteps[t].ppp;
-            vector<threevector> &x0 = atoms[i].timesteps[t-1].ppp_uw;
-            vector<threevector> &x1 = atoms[i].timesteps[t].ppp_uw;
-            for (unsigned a=0; a<x0.size(); a++) { //for atom in ppp vector
-               for (int x=0; x<3; x++) {  //for each dimension (0=x,1=y,2=z) {
-                  if ((abs(x0[a][x] -x1[a][x])) > latt[x][x]/2 ) { //if the difference is greater than half lv
-                     if (x0[a][x] < x1[a][x]) {sign=-1;} //if 
-                     else {sign=1;}
-                     x1[a][x] = x1[a][x] + sign*latt[x][x];
-                  }
+
+      for (unsigned t=1; t < atoms->timesteps.size(); t++) {//for each timestep
+         vector<threevector> &x0 = atoms->timesteps[t-1].ppp_uw;
+         vector<threevector> &x1 = atoms->timesteps[t].ppp_uw;
+         for (unsigned a=0; a<x0.size(); a++) { //for atom in ppp vector
+            for (int x=0; x<3; x++) {  //for each dimension (0=x,1=y,2=z) {
+               if ((abs(x0[a][x] -x1[a][x])) > latt[x][x]/2 ) { //if the difference is greater than half lv
+                  if (x0[a][x] < x1[a][x]) {sign=-1;} //if 
+                  else {sign=1;}
+                  x1[a][x] = x1[a][x] + sign*latt[x][x];
                }
             }
          }
       }
+      return 0;
+   }
+
+
+   int unwrap() {
+      int sign;
+      if (unwrapped_already) {return 0;}
+
+      for (unsigned i=0; i<atoms.size(); i++) {  // for each atom type
+         unwrap_atomType(&atoms[i]);
+      }
+
       unwrapped_already=true;
       return 0;
    }
@@ -310,7 +316,6 @@ struct atomfilter {
             filter_indices.push_back( stoi(rtrim(ltrim(desiredIndices[i]))));
          }
       }
-   
       //sort the vector by index.
       sort(filter_indices.begin(), filter_indices.end() );
    
@@ -330,11 +335,18 @@ struct atomfilter {
       //Fill the atomType object with time-dependent data
       atomType filtered_atoms;
       vector<TimeStep> alltimes;
-      for (unsigned t=0; t<vasprun->ntimesteps; t++) {
+      cout << "HERE" << endl;
+      cout << vasprun->allatoms.timesteps.size() << endl;
+      cout << vasprun->allatoms.timesteps[0].ppp_uw.size() << endl;
+      cout << "HERE" << endl;
+
+      for (unsigned t=0; t<vasprun->allatoms.timesteps.size(); t++) {
          TimeStep ts;
          for (int i=0; i<filter_indices.size(); i++ ) {
+//            cout << t << ":  " <<  filter_indices[i] << endl;
             ts.ppp.push_back( vasprun->allatoms.timesteps[t].ppp[filter_indices[i]]) ;
             ts.fff.push_back( vasprun->allatoms.timesteps[t].fff[filter_indices[i]]) ;
+            ts.ppp_uw.push_back( vasprun->allatoms.timesteps[t].ppp_uw[filter_indices[i]]) ;//vasprun->allatoms.timesteps[t].ppp_uw[filter_indices[i]]) ;
          }
          alltimes.push_back(ts);
       }
@@ -361,7 +373,7 @@ struct Configuration {
    
    bool msd;
    string msd_data_prefix;
-   vector<string> msd_atoms;
+   string msd_filter;
 
    bool rho;
    string rho_data_prefix;
