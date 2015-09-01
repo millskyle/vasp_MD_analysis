@@ -63,7 +63,7 @@ int spatial_distribution_projection(FileInfo *vasprun, Configuration *config) {
    //For each atom in the requested atom types
    for (int atomname=0; atomname < config->liquid_atoms.size(); atomname++) {
       //this pointer will point to the atomType object for this type of atom 
-      atomType* atomobject = vasprun->GetAtom(config->msd_atoms[atomname]);
+      atomType* atomobject = vasprun->GetAtom(config->liquid_atoms[atomname]);
       screen.step << "Binning the " + atomobject->element + " atoms";   
       
       //for each timestep
