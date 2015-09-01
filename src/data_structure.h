@@ -86,7 +86,7 @@ struct atomSet {
 };
 
 
-struct FileInfo {
+struct VasprunXML {
    //File input/output parameters
    string input_filename,output_data_location,system_name;
    INCAR incar;
@@ -161,10 +161,39 @@ struct FileInfo {
    }
 
 
+   int unwrap_atomType(atomType *atoms) {
+      //Copy the position vectors
+      int sign;
+      for (unsigned t=0; t < atoms->timesteps[0].ppp.size(); t++) {
+         atoms->timesteps[t].ppp_uw = atoms->timesteps[t].ppp;
+      }
+
+      for (unsigned t=1; t < atoms->timesteps[0].ppp.size(); t++) {//for each timestep
+         vector<threevector> &x0 = atoms->timesteps[t-1].ppp_uw;
+         vector<threevector> &x1 = atoms->timesteps[t].ppp_uw;
+         for (unsigned a=0; a<x0.size(); a++) { //for atom in ppp vector
+            for (int x=0; x<3; x++) {  //for each dimension (0=x,1=y,2=z) {
+               if ((abs(x0[a][x] -x1[a][x])) > latt[x][x]/2 ) { //if the difference is greater than half lv
+                  if (x0[a][x] < x1[a][x]) {sign=-1;} //if 
+                  else {sign=1;}
+                  x1[a][x] = x1[a][x] + sign*latt[x][x];
+               }
+            }
+         }
+      }
+      return 0;
+   }
+
+
    int unwrap() {
       int sign;
       if (unwrapped_already) {return 0;}
 
+      for (unsigned i=0; i<atoms.size(); i++) {  // for each atom type
+         unwrap_atomType(&atoms[i]);
+      }
+
+/*
       //copy the position vectors
       for (unsigned i=0; i<atoms.size(); i++) {  // for each atom type
          for (unsigned t=0; t < ntimesteps-1; t++) { //for each timestep
@@ -187,7 +216,7 @@ struct FileInfo {
                }
             }
          }
-      }
+      }  */
       unwrapped_already=true;
       return 0;
    }
@@ -237,7 +266,7 @@ struct FileInfo {
    }
 
 
-   FileInfo() {
+   VasprunXML() {
       numatoms=0;
       input_filename = "/tmp/garbage";
       output_data_location = "/tmp/";
@@ -269,7 +298,7 @@ struct atomfilter {
    // Funtion to execute the filter, filling the atoms object specified a couple of lines above with only
    // the atoms that are included in the filter.  This function called from main.cpp after file parsing done.
    //////////////
-   int execute_filter(FileInfo* vasprun) {
+   int execute_filter(VasprunXML* vasprun) {
       if (filter_type == "index_range") {
          //split the string on commas to get the ranges in separate elements
          vector<string> ranges = str2vec(criteria,",");
@@ -335,6 +364,7 @@ struct atomfilter {
          for (int i=0; i<filter_indices.size(); i++ ) {
             ts.ppp.push_back( vasprun->allatoms.timesteps[t].ppp[filter_indices[i]]) ;
             ts.fff.push_back( vasprun->allatoms.timesteps[t].fff[filter_indices[i]]) ;
+            ts.ppp_uw.push_back( vasprun->allatoms.timesteps[t].ppp_uw[filter_indices[i]]) ;
          }
          alltimes.push_back(ts);
       }
@@ -361,7 +391,7 @@ struct Configuration {
    
    bool msd;
    string msd_data_prefix;
-   vector<string> msd_atoms;
+   string msd_filter;
 
    bool rho;
    string rho_data_prefix;
