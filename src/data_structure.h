@@ -164,7 +164,6 @@ struct VasprunXML {
    int unwrap_atomType(atomType *atoms) {
       //Copy the position vectors
       int sign;
-      screen.step << "unwrapping...";
       for (unsigned t=0; t < atoms->timesteps.size(); t++) {
          atoms->timesteps[t].ppp_uw = atoms->timesteps[t].ppp;
       }
