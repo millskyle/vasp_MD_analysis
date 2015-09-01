@@ -384,16 +384,7 @@ struct Configuration {
    
 
    bool forces;
-   string forces_from_atom;
-   string forces_to_atom;
    int forces_bins;
-
-   string forces_select;
-   int forces_from_sID;
-   int forces_from_eID;
-   int forces_to_sID;
-   int forces_to_eID;
-
    string forces_set_1;
    string forces_set_2;
 
