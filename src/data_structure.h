@@ -341,7 +341,6 @@ struct atomfilter {
       for (int i=0; i<filter_indices.size(); i++ ) {
          j = filter_indices[i];
          filtered_symbols.push_back(vasprun->ion_symbols[j]);
-         cout << vasprun->ion_symbols[j] << endl;
          mass += vasprun->atomic_mass[vasprun->ion_symbols[j]];
 
       }
