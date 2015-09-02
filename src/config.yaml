@@ -13,7 +13,6 @@ plots:
   rdf_data_prefix: "rdf_"
   rdf_filter: 'liquidal'
   rdf_bins: 100
-  rdf_cut_half_lv: False
   rdf_plot_type: "lines"
 
   #Global density plots (density of the entire region occupied by rho_atoms
@@ -30,12 +29,8 @@ plots:
   nbins_x: 75
   nbins_y: 75
 
-  forces: False
-
-  # determines the method used to select atoms for force projections.
-  #    index:  selects atoms with indices between forces_from_sID and forces_from_eID 
-  #    type: selects atoms whose type (element symbol) is in forces_from_atom
-
+  forces: True
+  #projections from forces_set_1 to forces_set_2
   forces_set_1: 'liquidal'
   forces_set_2: 'liquidal'
   forces_bins: 300
