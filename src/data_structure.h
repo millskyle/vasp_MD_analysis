@@ -378,7 +378,6 @@ struct atomfilter {
 //         atoms.atoms.mass += vasprun->atomic_mass[filtered_symbols[i]];
 //      }
 
-      cout << "MASS: " << atoms.atoms.mass << endl;
 
      
       return 0; 
