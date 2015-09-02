@@ -64,9 +64,9 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "rdf_plot_type",config.rdf_plot_type);
 
    parse(plots, "rho",config.rho);
-   parse(plots,"rho_atoms",config.tempstr);
-      config.rho_atoms = str2vec(config.tempstr);
    parse(plots, "rho_data_prefix", config.rho_data_prefix);
+   parse(plots, "rho_filter", config.rho_filter);
+   parse(plots, "rho_experimental", config.rho_experimental);
 
    parse(plots, "spatial_distribution_projection", config.spatial_distribution_projection);
    parse(plots, "spatial_distribution_lattice", config.spatial_distribution_projection);

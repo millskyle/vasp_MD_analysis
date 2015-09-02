@@ -3,6 +3,7 @@
 
 #include "data_structure.h"
 #include "utility_functions.h"
+#include <climits>
 
 Conversions converter;
 
@@ -10,8 +11,6 @@ int global_density(VasprunXML *vasprun, Configuration *config) {
    if (!config->rho) {cout << "\nDensity function called but not requested in configuration. Exiting"; return 1;}
 
    screen.status << "Density calculations" ;
-   screen.step << "Density plots requested for " + vec2str(config->rho_atoms);
-  
   
    //Make a gnuplot object.  It takes care of writing the data to a script. 
    GnuPlotScript gnuplot ;
@@ -20,25 +19,26 @@ int global_density(VasprunXML *vasprun, Configuration *config) {
    gnuplot.command("plot ",false);
 
    //For each atom in the requested atom types
-   for (int atomname=0; atomname < config->rho_atoms.size(); atomname++) {
+   //for (int atomname=0; atomname < config->rho_atoms.size(); atomname++) {
       //this pointer will point to the atomType object for this type of atom 
-      atomType* atomobject = vasprun->GetAtom(config->rho_atoms[atomname]);
+      atomType* atomobject = &(config->atomfilters[config->rho_filter].atoms.atoms);
       
-      screen.step << "Beginning Density calculation for " + atomobject->element;   
+      screen.step << "Beginning Density calculation for filter " + config->rho_filter;   
       double x0,y0,z0;
       double x1,y1,z1;
+      int atomcount;
       //for each timestep which we have positions for
-      for (int t=1; t < atomobject->timesteps.size()-2; t++ ) {
+      for (int t=0; t < atomobject->timesteps.size(); t++ ) {
          //for each atom in the position vector of vectors
 
          vector<threevector>* positions= &atomobject->timesteps[t].ppp;
          
-         x0 = 100000;
-         y0 = 100000; 
-         z0 = 100000;
-         x1 = -100000; 
-         y1 = -100000; 
-         z1 = -100000;
+         x0 = 10000000.0;
+         y0 = 10000000.0;
+         z0 = 10000000.0;
+         x1 = -10000000.0;
+         y1 = -10000000.0;
+         z1 = -10000000.0;
          for (int a=0; a<positions->size(); a++) {
             if ((*positions)[a][0] < x0) { x0 = (*positions)[a][0]; }
             if ((*positions)[a][0] > x1) { x1 = (*positions)[a][0]; }
@@ -49,7 +49,7 @@ int global_density(VasprunXML *vasprun, Configuration *config) {
          }
          
 //         int atomcount = count_atoms_in_box(*positions, x0, x1, y0, y1, z0, z1);
-         int atomcount = atomobject->atomspertype;
+         atomcount = atomobject->timesteps[0].ppp.size(); 
          atomobject->timesteps[t].density = atomcount / ((x1-x0)*(y1-y0)*(z1-z0));
       }
 
@@ -84,24 +84,20 @@ int global_density(VasprunXML *vasprun, Configuration *config) {
 
 
 
+
+
    //write each timestep to a file
    for (int t=0; t < atomobject->timesteps.size(); t++) {
       if (atomobject->timesteps[t].density>0) {
          of << (  atomobject->timesteps[t].density * pow(converter.angstroms_per_cm,3)*
                   atomobject->mass *
-                  converter.moles_per_gram )  << 
-               "\t" << 
-               (  atomobject->atomspertype  / (vasprun->latt[0][0]*vasprun->latt[1][1]*vasprun->latt[2][2])
-                  * pow(converter.angstroms_per_cm,3)
-                  * atomobject->mass
-                  * converter.moles_per_gram ) <<
-               "\n" ;
+                  converter.moles_per_gram )  << "\t" <<  config->rho_experimental << " \n" ;
 
          //cout << atomobject->timesteps[t].density << "\n";
       }
    }
    of.close();   
-}
+//}
 
 
 

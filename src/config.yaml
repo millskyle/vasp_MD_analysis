@@ -19,7 +19,8 @@ plots:
   #Global density plots (density of the entire region occupied by rho_atoms
   rho: True
   rho_data_prefix: "rho_"
-  rho_atoms: 'Al'
+  rho_filter: 'liquidal'
+  rho_experimental: 2.356  #experimental density (will be plotted for comparison) in g/cm^3
 
   spatial_distribution_projection: False
   spatial_distribution_lattice: False

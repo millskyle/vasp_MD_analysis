@@ -335,9 +335,15 @@ struct atomfilter {
     
       ///////
       //Fill a vector with the symbols of the atoms contained in the filter
+      double mass = 0;
+      int j=0;
       vector<string> filtered_symbols;
       for (int i=0; i<filter_indices.size(); i++ ) {
-         filtered_symbols.push_back(vasprun->ion_symbols[i]);
+         j = filter_indices[i];
+         filtered_symbols.push_back(vasprun->ion_symbols[j]);
+         cout << vasprun->ion_symbols[j] << endl;
+         mass += vasprun->atomic_mass[vasprun->ion_symbols[j]];
+
       }
       ///////
 
@@ -360,10 +366,20 @@ struct atomfilter {
       filtered_atoms.timesteps = alltimes;
       filtered_atoms.symbols = filtered_symbols;
 
-  
+
+
+
       //update the filter.
       atoms.symbols = filtered_symbols;
       atoms.atoms = filtered_atoms;
+      
+      //weigh the atoms in the filter
+      atoms.atoms.mass=mass;
+//      for (int i=0; i<filtered_atoms.timesteps[0].ppp.size(); i++) {
+//         atoms.atoms.mass += vasprun->atomic_mass[filtered_symbols[i]];
+//      }
+
+      cout << "MASS: " << atoms.atoms.mass << endl;
 
      
       return 0; 
@@ -383,7 +399,9 @@ struct Configuration {
 
    bool rho;
    string rho_data_prefix;
-   vector<string> rho_atoms;
+   string rho_filter;
+   double rho_experimental;
+
 
    bool spatial_distribution_projection;
    bool spatial_distribution_lattice;
