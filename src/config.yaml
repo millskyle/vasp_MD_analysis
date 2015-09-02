@@ -37,7 +37,7 @@ plots:
   #    type: selects atoms whose type (element symbol) is in forces_from_atom
 
   forces_set_1: 'liquidal'
-  forces_set_2: 'forces2'
+  forces_set_2: 'liquidal'
   forces_bins: 300
 
 #----------------------------------------------------------------#
@@ -73,10 +73,10 @@ plots:
 
 atom_sets:
   - name: 'liquidal'
-    filter_type: "index_range"
-    criteria: "128:427"
+    filter_type: "symbol"
+    criteria: "Al"
 
-  - name: 'forces2'
+  - name: ''
     filter_type: "symbol"
     criteria: "N "
 

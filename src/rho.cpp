@@ -52,6 +52,9 @@ int global_density(VasprunXML *vasprun, Configuration *config) {
          atomcount = atomobject->timesteps[0].ppp.size(); 
          atomobject->timesteps[t].density = atomcount / ((x1-x0)*(y1-y0)*(z1-z0));
       }
+      screen.step << x1-x0;
+      screen.step << y1-y0;
+      screen.step << z1-z0;
 
    //write out the data for this element to an element-specific file
    ofstream of;
@@ -89,7 +92,7 @@ int global_density(VasprunXML *vasprun, Configuration *config) {
    //write each timestep to a file
    for (int t=0; t < atomobject->timesteps.size(); t++) {
       if (atomobject->timesteps[t].density>0) {
-         of << (  atomobject->timesteps[t].density * pow(converter.angstroms_per_cm,3)*
+         of << (  atomobject->timesteps[t].density/atomobject->timesteps[0].ppp.size() * pow(converter.angstroms_per_cm,3)*
                   atomobject->mass *
                   converter.moles_per_gram )  << "\t" <<  config->rho_experimental << " \n" ;
 
