@@ -403,17 +403,16 @@ struct Configuration {
 
    bool spatial_distribution_projection;
    bool spatial_distribution_lattice;
-   int collapse_dimension;
-   vector<string> lattice_atoms;
-   vector<string> liquid_atoms;
-   int nbins_x;
-   int nbins_y;
+   int sd_collapse_dimension;
+   int sd_nbins_v;
+   int sd_nbins_h;
+   string sd_dynamic_filter;
+   string sd_static_filter;
 
    bool rdf;
    string rdf_filter;
    string rdf_data_prefix;
    int rdf_bins;
-   bool rdf_cut_half_lv;
    string rdf_plot_type;   
    
 
@@ -433,11 +432,34 @@ struct Configuration {
 
    ofstream log;
    string log_file_location = "log";
+   map<string, string> elementcolors;
   
-      
+  Configuration() {      
+
+//most follow CPK standard
 
 
-   
+
+elementcolors["H"] = "#FFFFFF";
+elementcolors["C"] = "#222222";
+elementcolors["N"] = "#0028FF";
+elementcolors["O"] = "#FF2211";
+elementcolors["F"] = "#11FF11";
+elementcolors["Cl"] = "#C2FF62";
+elementcolors["B"] = "#FFC4EB";
+elementcolors["Al"] = "#CECECE";
+elementcolors["Ca"] = "#018600";
+elementcolors["Zr"] = "#7B3DCB";
+elementcolors["Si"] = "#FFF346";
+elementcolors["S"] = "#C4B800";
+elementcolors["Fe"] = "#9E6100";
+elementcolors["Ti"] = "#FF7300";
+
+
+
+  }
+
+
 } config;
    
 

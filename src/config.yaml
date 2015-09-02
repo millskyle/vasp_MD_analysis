@@ -4,32 +4,33 @@ files:
 
 
 plots:
-  msd: True 
+  msd: False 
   msd_data_prefix: "msd_"
   msd_reference_D: 4e-9 #diffusion coefficient to plot alongside data (for reference)
   msd_filter: 'liquidal'
 
-  rdf: True
+  rdf: False
   rdf_data_prefix: "rdf_"
   rdf_filter: 'liquidal'
   rdf_bins: 100
   rdf_plot_type: "lines"
 
   #Global density plots (density of the entire region occupied by rho_atoms
-  rho: True
+  rho: False
   rho_data_prefix: "rho_"
   rho_filter: 'liquidal'
   rho_experimental: 2.356  #experimental density (will be plotted for comparison) in g/cm^3
 
-  spatial_distribution_projection: False
-  spatial_distribution_lattice: False
-  collapse_dimension: 2
-  lattice_atoms: ' '
-  liquid_atoms: 'Al'
-  nbins_x: 75
-  nbins_y: 75
+  sd_projection: True
+  sd_collapse_dimension: 2
+#dynamic_filter is the set of atoms that will be collapsed/binned
+  sd_dynamic_filter: 'liquidal'
+#atoms in the static_filter set will be plotted explicitly at their average position on the plot
+  sd_static_filter: 'lattice'
+  sd_nbins_h: 75
+  sd_nbins_v: 75
 
-  forces: True
+  forces: False 
   #projections from forces_set_1 to forces_set_2
   forces_set_1: 'liquidal'
   forces_set_2: 'liquidal'
@@ -71,13 +72,10 @@ atom_sets:
     filter_type: "symbol"
     criteria: "Al"
 
-  - name: ''
+  - name: 'lattice'
     filter_type: "symbol"
-    criteria: "N "
+    criteria: " B N "
 
-
-
-  
 
 
 

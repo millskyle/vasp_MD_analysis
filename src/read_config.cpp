@@ -60,7 +60,6 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "rdf_filter", config.rdf_filter);
    parse(plots, "rdf_data_prefix", config.rdf_data_prefix);
    parse(plots, "rdf_bins",config.rdf_bins);
-   parse(plots, "rdf_cut_half_lv",config.rdf_cut_half_lv);
    parse(plots, "rdf_plot_type",config.rdf_plot_type);
 
    parse(plots, "rho",config.rho);
@@ -68,15 +67,12 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "rho_filter", config.rho_filter);
    parse(plots, "rho_experimental", config.rho_experimental);
 
-   parse(plots, "spatial_distribution_projection", config.spatial_distribution_projection);
-   parse(plots, "spatial_distribution_lattice", config.spatial_distribution_projection);
-   parse(plots, "collapse_dimension", config.collapse_dimension);
-   parse(plots, "lattice_atoms", config.tempstr);
-      config.lattice_atoms = str2vec(config.tempstr);
-   parse(plots, "liquid_atoms", config.tempstr);
-      config.liquid_atoms = str2vec(config.tempstr);
-   parse(plots, "nbins_x", config.nbins_x);
-   parse(plots, "nbins_y", config.nbins_y);
+   parse(plots, "sd_projection", config.spatial_distribution_projection);
+   parse(plots, "sd_collapse_dimension", config.sd_collapse_dimension);
+   parse(plots, "sd_dynamic_filter", config.sd_dynamic_filter);
+   parse(plots, "sd_static_filter", config.sd_static_filter);
+   parse(plots, "sd_nbins_v", config.sd_nbins_v);
+   parse(plots, "sd_nbins_h", config.sd_nbins_h);
 
    parse(plots, "forces", config.forces);
    parse(plots, "forces_bins", config.forces_bins);
