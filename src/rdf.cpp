@@ -45,6 +45,7 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
       double distance;
 
       vector<double> bin_cutoff;
+      vector<int> bin_count;
       
       int nbins = config->rdf_bins;
       vector<int> bins;
@@ -79,7 +80,9 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
             if (ya < ymin) {ymin = ya;}
             if (za < zmin) {zmin = za;}
 
-            for (int b=a+1; b<atomobject->timesteps[0].ppp.size(); b++ ) {
+            for (int b=a+1; b<atomobject->timesteps[0].ppp.size(); b++ ) { 
+               //don't want to double-count as that wastes resources.
+               //But if we don't double count, then we need to multiply by 2 later
                xb = atomobject->timesteps[t].ppp[b][0];
                yb = atomobject->timesteps[t].ppp[b][1];
                zb = atomobject->timesteps[t].ppp[b][2];
@@ -118,9 +121,11 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
 
       double atomic_density = atomobject->timesteps[0].ppp.size() / (sum_volume/atomobject->timesteps.size());
       //write each timestep to a file
-      for (int n=0; n < nbins-1; n++) {
-         double normalization = atomic_density / (4*3.14159264*bin_cutoff[n]*bin_cutoff[n]*bin_width*atomobject->timesteps.size() );
-         of << bin_cutoff[n] << "\t" << bins[n]*normalization << "\n" ;
+      double normalization ; 
+      for (int n=0; n < nbins; n++) {
+         //normalization = atomic_density * (4*3.14159264*bin_cutoff[n]*bin_cutoff[n]*bin_width*atomobject->timesteps.size() );
+         normalization = (1.0/2.0) * atomic_density * (4.0/3.0)*3.14159 * ( pow((bin_cutoff[n]+bin_width ),3) - pow( (bin_cutoff[n] ),3 )   ) * atomobject->timesteps.size();
+         of << bin_cutoff[n] << "\t" << bins[n]/normalization/atomobject->timesteps[0].ppp.size() << "\n" ;
       }
       of.close();
 

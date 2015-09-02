@@ -52,9 +52,6 @@ int global_density(VasprunXML *vasprun, Configuration *config) {
          atomcount = atomobject->timesteps[0].ppp.size(); 
          atomobject->timesteps[t].density = atomcount / ((x1-x0)*(y1-y0)*(z1-z0));
       }
-      screen.step << x1-x0;
-      screen.step << y1-y0;
-      screen.step << z1-z0;
 
    //write out the data for this element to an element-specific file
    ofstream of;
