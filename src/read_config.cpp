@@ -42,6 +42,8 @@ void parse_inputfile(Configuration& config, const Node& node) {
 
 
    const Node& plots = node["plots"];
+   parse(plots, "p_t_start_timestep", config.p_t_start_timestep);
+   parse(plots, "e_t_start_timestep", config.e_t_start_timestep);
 
 
    parse(plots, "msd", config.msd);

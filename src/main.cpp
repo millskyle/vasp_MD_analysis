@@ -7,6 +7,7 @@
 #include "rho.cpp"
 #include "spatial_dist.cpp"
 #include "forces.cpp"
+#include "PET.cpp"
 
 
 using namespace std;
@@ -41,6 +42,8 @@ int main() {
 
 
    screen.section << "PLOTS";
+   PET_plots(&v, &config);
+
    if (config.msd) {
       mean_square_displacement(&v, &config);
    }

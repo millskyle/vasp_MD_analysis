@@ -56,9 +56,14 @@ struct TimeStep {
    vector<threevector> ppp;
    vector<threevector> ppp_uw; //unwrapped
    vector<threevector> fff;
+   double stress_tensor[3][3];
    double MSD=-999;
    vector<double> COM;
+   map<string,double> energy;
    double density=0;
+   double pressure() {
+      return (stress_tensor[0][0] + stress_tensor[1][1] + stress_tensor[2][2])/3.0;
+   }
    TimeStep() {
       COM.push_back(0);
       COM.push_back(0);
@@ -389,7 +394,10 @@ struct atomfilter {
 
 struct Configuration {
    string tempstr;
-   
+  
+   int p_t_start_timestep;
+   int e_t_start_timestep;
+
    bool msd;
    string msd_data_prefix;
    string msd_filter;

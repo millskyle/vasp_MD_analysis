@@ -9,6 +9,10 @@ files:
 
 
 plots:
+  p_t_start_timestep: 200 # y-range of plot will be scaled to fit timesteps.  Helpful if you have high-magnitude data from the equilibration phase 
+  e_t_start_timestep: 200
+
+
   msd: False 
   msd_data_prefix: "msd_"
   msd_reference_D: 4e-9 #diffusion coefficient to plot alongside data (for reference)
