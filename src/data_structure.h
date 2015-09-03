@@ -396,6 +396,7 @@ struct Configuration {
    string tempstr;
   
    int p_t_start_timestep;
+   int e_t_start_timestep;
 
    bool msd;
    string msd_data_prefix;
