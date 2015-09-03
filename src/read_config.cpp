@@ -17,11 +17,6 @@ static void parse(const Node& node, const char* key, T& value) {
     }
 }
 
-
-
-
-
-
 static map<string, atomfilter> parse_atom_selections(Configuration& config, const Node& node) {
    const Node& atom_selections = node["atom_sets"];
    map<string, atomfilter> allfilters;
@@ -37,10 +32,6 @@ static map<string, atomfilter> parse_atom_selections(Configuration& config, cons
    return allfilters;
 }
 
-
-
-
-
 void parse_inputfile(Configuration& config, const Node& node) {
    const Node& files = node["files"];
    parse(files, "log",config.log_file_location);
@@ -51,13 +42,16 @@ void parse_inputfile(Configuration& config, const Node& node) {
 
 
    const Node& plots = node["plots"];
+
+
    parse(plots, "msd", config.msd);
    parse(plots, "msd_data_prefix", config.msd_data_prefix);
    parse(plots, "msd_filter", config.msd_filter);
    parse(plots, "msd_reference_D", config.msd_reference_D);
     
    parse(plots, "rdf", config.rdf);
-   parse(plots, "rdf_filter", config.rdf_filter);
+   parse(plots, "rdf_filter_1", config.rdf_filter_1);
+   parse(plots, "rdf_filter_2", config.rdf_filter_2);
    parse(plots, "rdf_data_prefix", config.rdf_data_prefix);
    parse(plots, "rdf_bins",config.rdf_bins);
    parse(plots, "rdf_plot_type",config.rdf_plot_type);
@@ -85,10 +79,6 @@ void parse_inputfile(Configuration& config, const Node& node) {
 
 
 }
-
-
-
-
 
 
 bool read_configfile(Configuration& config) {

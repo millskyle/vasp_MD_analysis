@@ -1,3 +1,8 @@
+vasprun:
+  - name: 'PureAl'
+    file: 'vasprun.xml'
+
+
 files:
   log: "log"
   script_wrapper: "output/make_all_plots.sh"
@@ -9,10 +14,11 @@ plots:
   msd_reference_D: 4e-9 #diffusion coefficient to plot alongside data (for reference)
   msd_filter: 'liquidal'
 
-  rdf: False
+  rdf: True
   rdf_data_prefix: "rdf_"
-  rdf_filter: 'liquidal'
-  rdf_bins: 100
+  rdf_filter_1: 'liquidal'
+  rdf_filter_2: 'liquidal'
+  rdf_bins: 200
   rdf_plot_type: "lines"
 
   #Global density plots (density of the entire region occupied by rho_atoms

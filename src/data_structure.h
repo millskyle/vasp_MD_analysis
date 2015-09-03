@@ -410,7 +410,8 @@ struct Configuration {
    string sd_static_filter;
 
    bool rdf;
-   string rdf_filter;
+   string rdf_filter_1;
+   string rdf_filter_2;
    string rdf_data_prefix;
    int rdf_bins;
    string rdf_plot_type;   
