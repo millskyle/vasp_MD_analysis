@@ -1,15 +1,15 @@
 vaspruns:
-  - label: 'Pure Aluminum'
-    file: 'vaspruns/pure.xml'
+#  - label: 'Pure Aluminum'
+#    file: 'vaspruns/pure.xml'
 
-  - label: '1.2wt% Zr'
-    file: 'vaspruns/zr1.xml'
-
-  - label: '3.3wt% Zr'
-    file: 'vaspruns/zr3.xml'
-
-  - label: '5.4wt% Zr'
-    file: 'vaspruns/zr5.xml'
+#  - label: '1.2wt% Zr'
+#    file: 'vaspruns/zr1.xml'
+#
+#  - label: '3.3wt% Zr'
+#    file: 'vaspruns/zr3.xml'
+#
+#  - label: '5.4wt% Zr'
+#    file: 'vaspruns/zr5.xml'
 
 
   - label: '0.5wt% doped Ca'
@@ -52,7 +52,7 @@ plots:
   rdf: True
   rdf_data_prefix: "rdf_"
   rdf_filter_1: 'liquidal'
-  rdf_filter_2: 'liquidal'
+  rdf_filter_2: 'Ca'
   rdf_bins: 200
   rdf_plot_type: "lines"
 
@@ -113,9 +113,13 @@ atom_sets:
     filter_type: "symbol"
     criteria: "Al"
 
-  - name: 'lattice'
+  - name: 'Zr'
     filter_type: "symbol"
-    criteria: " B N "
+    criteria: " r "
+
+  - name: 'Ca'
+    filter_type: "symbol"
+    criteria: " Ca "
 
 
 
