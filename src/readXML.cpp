@@ -127,6 +127,18 @@ int readXML(VasprunXML *vasprun) {
    //for each timestep
    for (xpath_node_set::const_iterator it = ns_timesteps.begin(); it != ns_timesteps.end(); ++it) {
       TimeStep thisStep;
+      //get stress tensor:
+      ns_temp = it->node().select_nodes(".//varray[@name='stress']/v");
+      vector<string> this_row;
+      for (int i =0; i<3; i++) {
+         this_row = str2vec(ns_temp[i].node().child_value()," ");
+         thisStep.stress_tensor[0][i] = stod(this_row[0]);
+         thisStep.stress_tensor[1][i] = stod(this_row[1]);
+         thisStep.stress_tensor[2][i] = stod(this_row[2]);         
+      }
+      cout << "Pressure:\t" << thisStep.pressure() << endl;;
+
+
       ns_temp = it->node().select_nodes(".//structure/varray[@name='positions']");
       if (ns_temp.size() > 0) {
          n_temp = it->node().select_nodes(".//structure/varray[@name='positions']")[0].node();
