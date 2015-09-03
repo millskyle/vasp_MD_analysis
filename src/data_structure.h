@@ -93,7 +93,8 @@ struct atomSet {
 
 
 struct VasprunXML {
-   //File input/output parameters
+   //File input/output parametersi
+   string label;
    string input_filename,output_data_location,system_name;
    INCAR incar;
    //File data structures
@@ -391,8 +392,16 @@ struct atomfilter {
 };
 
 
-
 struct Configuration {
+   
+   vector<string> vaspruns_labels;
+   map<string, string> vaspruns_meta;
+   map<string, VasprunXML> vaspruns;
+   
+   
+   
+   
+   
    string tempstr;
   
    int p_t_start_timestep;

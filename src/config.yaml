@@ -1,6 +1,12 @@
-vasprun:
-  - name: 'PureAl'
+vaspruns:
+  - label: 'PureAl'
+    file: 'vasprun_al_pure.xml'
+  - label: 'AlZr'
+    file: 'vasprun_AlZr.xml'
+  - label: 'AlCa'
     file: 'vasprun.xml'
+
+
 
 
 files:

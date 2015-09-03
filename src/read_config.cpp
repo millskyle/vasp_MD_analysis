@@ -17,6 +17,9 @@ static void parse(const Node& node, const char* key, T& value) {
     }
 }
 
+
+
+
 static map<string, atomfilter> parse_atom_selections(Configuration& config, const Node& node) {
    const Node& atom_selections = node["atom_sets"];
    map<string, atomfilter> allfilters;
@@ -31,6 +34,27 @@ static map<string, atomfilter> parse_atom_selections(Configuration& config, cons
    }
    return allfilters;
 }
+
+
+
+static int parse_input_file_choices(Configuration &config, const Node& node) {
+   const Node& vaspruns = node["vaspruns"];
+   string thisLabel;
+   string thisLocation;
+   for (int i=0; i<vaspruns.size(); i++) {
+      parse(vaspruns[i], "label", thisLabel);
+      parse(vaspruns[i], "file", thisLocation);
+      config.vaspruns_labels.push_back(thisLabel);
+      config.vaspruns_meta[thisLabel] = thisLocation;
+      VasprunXML v;
+      v.input_filename = thisLocation;
+      config.vaspruns[thisLabel] = v;
+   }
+   return 0;
+}
+
+
+
 
 void parse_inputfile(Configuration& config, const Node& node) {
    const Node& files = node["files"];
@@ -77,8 +101,14 @@ void parse_inputfile(Configuration& config, const Node& node) {
 
 
    config.atomfilters = parse_atom_selections(config, node );
-   
 
+   parse_input_file_choices(config, node);
+   
+   for (int i =0; i<config.vaspruns_labels.size(); i++) {
+      cout << config.vaspruns_labels[i] << endl;
+      cout << " - " << config.vaspruns_meta[config.vaspruns_labels[i]] << endl;
+
+   }
 
 }
 
