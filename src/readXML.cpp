@@ -136,7 +136,13 @@ int readXML(VasprunXML *vasprun) {
          thisStep.stress_tensor[1][i] = stod(this_row[1]);
          thisStep.stress_tensor[2][i] = stod(this_row[2]);         
       }
-      cout << "Pressure:\t" << thisStep.pressure() << endl;;
+
+      //get energies:
+      ns_temp = it->node().select_nodes("./energy/i");
+      for (int i=0; i<ns_temp.size(); i++) {
+         thisStep.energy[ns_temp[i].node().attribute("name").value()] = stod(ns_temp[i].node().child_value());
+      }
+      
 
 
       ns_temp = it->node().select_nodes(".//structure/varray[@name='positions']");
