@@ -45,10 +45,10 @@ static int parse_input_file_choices(Configuration &config, const Node& node) {
       parse(vaspruns[i], "label", thisLabel);
       parse(vaspruns[i], "file", thisLocation);
       config.vaspruns_labels.push_back(thisLabel);
-      config.vaspruns_meta[thisLabel] = thisLocation;
       VasprunXML v;
       v.input_filename = thisLocation;
-      config.vaspruns[thisLabel] = v;
+      v.label = thisLabel;
+      config.vaspruns.push_back(v);
    }
    return 0;
 }
@@ -104,11 +104,6 @@ void parse_inputfile(Configuration& config, const Node& node) {
 
    parse_input_file_choices(config, node);
    
-   for (int i =0; i<config.vaspruns_labels.size(); i++) {
-      cout << config.vaspruns_labels[i] << endl;
-      cout << " - " << config.vaspruns_meta[config.vaspruns_labels[i]] << endl;
-
-   }
 
 }
 

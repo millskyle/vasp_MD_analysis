@@ -2,27 +2,18 @@
 #define RDF_H
 
 #include "data_structure.h"
+#include <map>
 
 /* int nint(float x) {
    return floor(x+0.5);
 } */
 
 
+GnuPlotScript gnuplot;
+
+
+
 int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
-   if (!config->rdf) {cout << "\nRDF called but not requested in configuration. Exiting"; return 1;}
-
-   screen.status << "Radial Distribution Function";
-//   screen.step   << "RDF requested for " + vec2str(config->rdf_atoms);
-   
-   //Start a simple bash script which calls GNUplot to plot the msd data
-
-   GnuPlotScript gnuplot;
-   gnuplot.initialise("rdf","Radial distribution function","r, Angstroms","g(r)","rdf.pdf");
-   gnuplot.command("set xrange[0:9]");
-   gnuplot.command("set yrange[0:3]");
-
-   gnuplot.command("plot ", false);
-
 
    //find the minimum cell dimension...we can't plot the RDF past half of this.
    double minimum_dimension = 10000000000000000;
@@ -37,8 +28,8 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
    //For each atom in the requested atom types
 //   for (int atomname=0; atomname < config->rdf_atoms.size(); atomname++) {
       //this pointer will point to the atomType object for this type of atom 
-      atomType* atomobject0 = &(config->atomfilters[config->rdf_filter_1].atoms.atoms);
-      atomType* atomobject1 = &(config->atomfilters[config->rdf_filter_2].atoms.atoms);
+      atomType* atomobject0 = &(vasprun->atomfilters[config->rdf_filter_1].atoms.atoms);
+      atomType* atomobject1 = &(vasprun->atomfilters[config->rdf_filter_2].atoms.atoms);
       screen.step << "Beginning RDF calculation between "  + config->rdf_filter_1 + " and " + config->rdf_filter_2 ;
       //screen.data("      Number of data points",atomobject0->timesteps[0].ppp.size()*atomobject1->timesteps[0].ppp.size()*atomobject0->timesteps.size());
       
@@ -122,10 +113,10 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
   
       //write out the data for this element to an element-specific file
       ofstream of;
-      of.open("output/rdf.data");     
+      of.open("output/rdf_" + vasprun->label + ".data");     
        
       //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
-      gnuplot.command("'rdf.data' with lines title 'g(r) between " + config->rdf_filter_1 + " and " + config->rdf_filter_2 + "' ls "  + gnuplot.style()  + " lw 3 , "
+      gnuplot.command("'rdf_" + vasprun->label + ".data' with lines title 'g(r) between " + config->rdf_filter_1 + " and " + config->rdf_filter_2 + " for " + vasprun->label + "' ls "  + gnuplot.style()  + " lw 3 , "
          , false);
 
 //      double atomic_density = (atomobject0->timesteps[0].ppp.size() + atomobject1->timesteps[0].ppp.size()) / (sum_volume/atomobject0->timesteps.size());
@@ -143,14 +134,41 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
 
   // }
 
+
+   return 0;
+
+}
+
+
+int radial_distribution_function_wrapper(Configuration *config) {
+   if (!config->rdf) {cout << "\nRDF called but not requested in configuration. Exiting"; return 1;}
+   screen.status << "Radial Distribution Function";
+
+   //Start a simple bash script which calls GNUplot to plot the msd data
+   gnuplot.initialise("rdf","Radial distribution function","r, Angstroms","g(r)","rdf.pdf");
+   gnuplot.command("set xrange[0:9]");
+   gnuplot.command("set yrange[0:3]");
+
+   gnuplot.command("plot ", false);
+
+   for (int i=0; i<config->vaspruns.size(); i++) {
+      radial_distribution_function(&config->vaspruns[i], config);
+   }
+
+   cout << "HERE" << endl;
+
    //Close off the GNUPlot script
    gnuplot.close();
 
    //add a command to the global plot script to make the msd plots
    config->script_wrapper << "\ngnuplot plot_rdf.gnu \n" ;   
 
+   cout << "HERE" << endl;
    return 0;
 
 }
+
+
+
 
 #endif

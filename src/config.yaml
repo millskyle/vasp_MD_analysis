@@ -1,10 +1,10 @@
 vaspruns:
-  - label: 'PureAl'
-    file: 'vasprun_al_pure.xml'
-  - label: 'AlZr'
-    file: 'vasprun_AlZr.xml'
-  - label: 'AlCa'
-    file: 'vasprun.xml'
+  - label: 'Pure Aluminum'
+    file: 'pure.xml'
+  - label: '1% doped Zr'
+    file: 'Zr3.xml'
+  - label: '1% doped Ca'
+    file: 'Ca3.xml'
 
 
 

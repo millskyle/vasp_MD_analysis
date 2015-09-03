@@ -17,38 +17,51 @@ using namespace std;
 
 int main() {
    cout << BOLDRED << "WELCOME!!!" << RESET << "\n";
-   VasprunXML v;
    Configuration config;
    read_configfile(config);
 
-   v.input_filename="vasprun.xml";
-
-   screen.section << "READING FILE";
-   if (readXML(&v)==1)  {
-      screen.error << "READING XML FILE FAILED. EXITING\n";
-      return 0;
-   } else {
-      screen.finished << "Successfully read XML file";
-   }
 
 
-   screen.section << "CREATING ATOM SUBSETS";
-   for (int i=0; i<config.filter_name_list.size(); i++) {
-      screen.step << "Creating set: " + config.filter_name_list[i]; 
-      config.atomfilters[config.filter_name_list[i]].execute_filter(&v);
-      screen.data("      atoms",config.atomfilters[config.filter_name_list[i]].atoms.atoms.timesteps[0].ppp.size() );
-   }
+   VasprunXML* v;
+   
+   for (int f=0; f<config.vaspruns_labels.size(); f++) {
+      screen.section << "READING FILE " + config.vaspruns_labels[f];
+      v = &config.vaspruns[f];
+      if (readXML(&config.vaspruns[f]) == 1)  {
+         screen.error << "READING XML FILE FAILED. EXITING\n";
+         return 0;
+      } else {
+         screen.finished << "Successfully read XML file";
+      }
+
+
+
+      screen.section << "CREATING ATOM SUBSETS";
+      for (int i=0; i<config.filter_name_list.size(); i++) {
+         screen.step << "Creating set: " + config.filter_name_list[i]; 
+         config.atomfilters[config.filter_name_list[i]].execute_filter(v);
+         screen.data("   atoms",config.atomfilters[config.filter_name_list[i]].atoms.atoms.timesteps[0].ppp.size() );
+      }
+
+
+   v->atomfilters = config.atomfilters;
+
+
+}
+
 
 
 
    screen.section << "PLOTS";
+   if (config.rdf) {
+      radial_distribution_function_wrapper(&config);
+   }
+
+/*
    PET_plots(&v, &config);
 
    if (config.msd) {
       mean_square_displacement(&v, &config);
-   }
-   if (config.rdf) {
-      radial_distribution_function(&v, &config);
    }
    if (config.rho) {
       global_density(&v, &config);
@@ -59,6 +72,8 @@ int main() {
    if (config.forces) {
       force_bond_projections(&v, &config);
    }
+
+   */
 
 
    config.script_wrapper.close();

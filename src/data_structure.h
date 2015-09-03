@@ -91,6 +91,7 @@ struct atomSet {
    atomType atoms;
 };
 
+struct atomfilter;
 
 struct VasprunXML {
    //File input/output parametersi
@@ -108,6 +109,7 @@ struct VasprunXML {
    vector<atomType> atoms;
    vector<TimeStep> timesteps;
    vector<string> ion_symbols;
+   map <string, atomfilter> atomfilters;
    float totalMass=0;
    double dt,starting_temperature; //timestep length, delta t
 
@@ -293,6 +295,8 @@ struct atomfilter {
    // the atoms that are included in the filter.  This function called from main.cpp after file parsing done.
    //////////////
    int execute_filter(VasprunXML* vasprun) {
+      filter_indices.clear();
+
       if (filter_type == "index_range") {
          //split the string on commas to get the ranges in separate elements
          vector<string> ranges = str2vec(criteria,",");
@@ -395,8 +399,8 @@ struct atomfilter {
 struct Configuration {
    
    vector<string> vaspruns_labels;
-   map<string, string> vaspruns_meta;
-   map<string, VasprunXML> vaspruns;
+   vector<VasprunXML> vaspruns;
+//   map<string, VasprunXML> vaspruns;
    
    
    
@@ -480,21 +484,6 @@ elementcolors["Ti"] = "#FF7300";
 
 } config;
    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
