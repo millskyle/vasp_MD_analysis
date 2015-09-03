@@ -57,9 +57,9 @@ int main() {
       radial_distribution_function_wrapper(&config);
    }
 
-/*
-   PET_plots(&v, &config);
+   PET_plots_wrapper(&config);
 
+/*
    if (config.msd) {
       mean_square_displacement(&v, &config);
    }

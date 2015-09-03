@@ -2,12 +2,6 @@
 #define RDF_H
 
 #include "data_structure.h"
-#include <map>
-
-/* int nint(float x) {
-   return floor(x+0.5);
-} */
-
 
 GnuPlotScript gnuplot;
 
