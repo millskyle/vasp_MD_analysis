@@ -404,7 +404,8 @@ struct Configuration {
    
    
    
-   
+   int time_start ; 
+   int time_end ; 
    
    string tempstr;
   
@@ -415,6 +416,7 @@ struct Configuration {
    string msd_data_prefix;
    string msd_filter;
    string msd_reference_D;
+   string msd_reference_shift;
 
    bool rho;
    string rho_data_prefix;

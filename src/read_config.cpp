@@ -74,6 +74,7 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "msd_data_prefix", config.msd_data_prefix);
    parse(plots, "msd_filter", config.msd_filter);
    parse(plots, "msd_reference_D", config.msd_reference_D);
+   parse(plots, "msd_reference_shift", config.msd_reference_shift);
     
    parse(plots, "rdf", config.rdf);
    parse(plots, "rdf_filter_1", config.rdf_filter_1);
@@ -98,6 +99,12 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "forces_bins", config.forces_bins);
    parse(plots, "forces_set_1", config.forces_set_1);
    parse(plots, "forces_set_2", config.forces_set_2);
+
+
+   parse(files, "time_start", config.time_start);
+   parse(files, "time_end", config.time_end);
+   
+   cout << config.time_start << "   " << config.time_end << endl;
 
 
    config.atomfilters = parse_atom_selections(config, node );

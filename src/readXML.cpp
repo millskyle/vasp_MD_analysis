@@ -28,7 +28,7 @@ bool update_3d_vector(vector<threevector>* objectToUpdate, float x, float y, flo
    return true;
 }
 
-int readXML(VasprunXML *vasprun) {
+int readXML(VasprunXML *vasprun, Configuration *config) {
    float x, y, z;
    vector<float> r;
 
@@ -168,6 +168,36 @@ int readXML(VasprunXML *vasprun) {
          vasprun->timesteps.push_back(thisStep);
       }
    }
+
+
+
+   int ts_count = 0;
+   vector<TimeStep>  new_timesteps;
+   cout << config->time_start << "   " << config->time_end << endl;
+   if (config->time_end > vasprun->timesteps.size()) {
+      screen.error << "Specified end time greater than total timesteps.";
+      config->time_end = vasprun->timesteps.size() - 1; 
+   }
+   if (config->time_start > vasprun->timesteps.size()) {
+      screen.error << "Specified start time (time_start) greater than total timesteps";
+      config->time_start=0;
+   }
+   if (config->time_end <= config->time_start) {
+      screen.error << "Specified start time (time_start) is greater than end time (time_end). Disabling this feature";
+      config->time_start=0;
+      config->time_end=vasprun->timesteps.size()-1;
+   }
+
+
+   for (int t=config->time_start; t<=config->time_end; t++) {
+      new_timesteps.push_back(vasprun->timesteps[t]);
+   }
+   vasprun->timesteps = new_timesteps;
+
+
+
+
+
 
 
    cout << "DONE PARSING" << endl;

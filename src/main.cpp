@@ -28,7 +28,7 @@ int main() {
    for (int f=0; f<config.vaspruns_labels.size(); f++) {
       screen.section << "READING FILE " + config.vaspruns_labels[f];
       v = &config.vaspruns[f];
-      if (readXML(&config.vaspruns[f]) == 1)  {
+      if (readXML(&config.vaspruns[f], &config) == 1)  {
          screen.error << "READING XML FILE FAILED. EXITING\n";
          return 0;
       } else {
