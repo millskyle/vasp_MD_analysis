@@ -15,6 +15,7 @@ using namespace std;
 //extern ScreenOutput screen;
 
 
+
 int main() {
    cout << BOLDRED << "WELCOME!!!" << RESET << "\n";
    Configuration config;
@@ -59,10 +60,10 @@ int main() {
 
    PET_plots_wrapper(&config);
 
-/*
    if (config.msd) {
-      mean_square_displacement(&v, &config);
+      msd_wrapper(&config);
    }
+/*
    if (config.rho) {
       global_density(&v, &config);
    }

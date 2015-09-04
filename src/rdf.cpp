@@ -3,11 +3,10 @@
 
 #include "data_structure.h"
 
-GnuPlotScript gnuplot;
 
 
 
-int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
+int radial_distribution_function(VasprunXML *vasprun, Configuration *config, GnuPlotScript* gnuplot) {
 
    //find the minimum cell dimension...we can't plot the RDF past half of this.
    double minimum_dimension = 10000000000000000;
@@ -110,7 +109,7 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config) {
       of.open("output/rdf_" + vasprun->label + ".data");     
        
       //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
-      gnuplot.command("'rdf_" + vasprun->label + ".data' with lines title 'g(r) between " + config->rdf_filter_1 + " and " + config->rdf_filter_2 + " for " + vasprun->label + "' ls "  + gnuplot.style()  + " lw 3 , "
+      gnuplot->command("'rdf_" + vasprun->label + ".data' with lines title 'g(r) between " + config->rdf_filter_1 + " and " + config->rdf_filter_2 + " for " + vasprun->label + "' ls "  + gnuplot->style()  + " lw 3 , "
          , false);
 
 //      double atomic_density = (atomobject0->timesteps[0].ppp.size() + atomobject1->timesteps[0].ppp.size()) / (sum_volume/atomobject0->timesteps.size());
@@ -138,6 +137,7 @@ int radial_distribution_function_wrapper(Configuration *config) {
    if (!config->rdf) {cout << "\nRDF called but not requested in configuration. Exiting"; return 1;}
    screen.status << "Radial Distribution Function";
 
+   GnuPlotScript gnuplot;
    //Start a simple bash script which calls GNUplot to plot the msd data
    gnuplot.initialise("rdf","Radial distribution function","r, Angstroms","g(r)","rdf.pdf");
    gnuplot.command("set xrange[0:9]");
@@ -146,10 +146,8 @@ int radial_distribution_function_wrapper(Configuration *config) {
    gnuplot.command("plot ", false);
 
    for (int i=0; i<config->vaspruns.size(); i++) {
-      radial_distribution_function(&config->vaspruns[i], config);
+      radial_distribution_function(&config->vaspruns[i], config, &gnuplot);
    }
-
-   cout << "HERE" << endl;
 
    //Close off the GNUPlot script
    gnuplot.close();

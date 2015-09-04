@@ -6,26 +6,7 @@
 
 
 
-//Make a gnuplot object.  It takes care of writing the data to a script.
-//GnuPlotScript gnuplot ;
-GnuPlotScript gnuplotE ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-int PET_plots(VasprunXML *vasprun, Configuration *config) {
+int PET_plots(VasprunXML *vasprun, Configuration *config, GnuPlotScript *gnuplot, GnuPlotScript *gnuplotE) {
    
 
    //For each atom in the requested atom types
@@ -73,8 +54,8 @@ int PET_plots(VasprunXML *vasprun, Configuration *config) {
    et.close();
 
    //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
-   gnuplotE.command("'e-t_" + vasprun->label + ".data' using 1:2 with lines ls " + gnuplotE.style() + " lw 3  , " ,false);
-   gnuplot.command("'p-t_" + vasprun->label + ".data' using 1:2 with lines ls " + gnuplot.style() + " lw 3  , " ,false);
+   gnuplotE->command("'e-t_" + vasprun->label + ".data' using 1:2 with lines ls " + gnuplotE->style() + " lw 3  , " ,false);
+   gnuplot->command("'p-t_" + vasprun->label + ".data' using 1:2 with lines ls " + gnuplot->style() + " lw 3  , " ,false);
    return 0;
 
 }
@@ -83,6 +64,10 @@ int PET_plots_wrapper(Configuration *config) {
    
    screen.status << "Plotting pressure, energy as a function of time";
   
+   GnuPlotScript gnuplot;
+   GnuPlotScript gnuplotE;
+
+
    gnuplotE.initialise("E-t","Energy vs. Time","Time, [picoseconds]","Total Energy [eV]","E-t.pdf");
    gnuplot.initialise("P-t","Pressure vs. Time","Time, [picoseconds]","Pressure [kB]","P-t.pdf");
 
@@ -93,7 +78,7 @@ int PET_plots_wrapper(Configuration *config) {
    gnuplot.command("plot ",false);
 
    for (int i=0; i<config->vaspruns.size(); i++) {
-      PET_plots( &config->vaspruns[i], config);
+      PET_plots( &config->vaspruns[i], config, &gnuplot, &gnuplotE);
    }
 
 
