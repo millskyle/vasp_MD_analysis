@@ -34,17 +34,19 @@ int mean_square_displacement(VasprunXML *vasprun, Configuration *config, GnuPlot
          MSD_c[t]=0;
       }
 
-      
-
+      //total timesteps is 1+2+3+4+5+...+T, or (T**2 + T)/2 
+      int progress_total = ( pow(atomobject->timesteps.size(),2) + atomobject->timesteps.size())/2.0;
+      int progress_current = 0;
 
 
       double zdist;
       //for each timestep which we have positions for
       cout << "   t = 0      " ;
       for (int t=0; t < atomobject->timesteps.size()-1; t++ ) {
-         cout << "\r   t = "<<t<<"      ";
+         cout << "\r   t = "<<t<<"      "<< 100 * float(progress_current) / float(progress_total) << "\% complete        ";
          cout.flush();
       for (int t0=0; t0< t ; t0++) {
+         progress_current++;
          //for each atom in the position vector of vectors
          for (int a=0; a<atomobject->timesteps[t].ppp.size(); a++) {
   //             int t0=0; //the timestep to calculate displacement from

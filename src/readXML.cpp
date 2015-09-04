@@ -172,24 +172,25 @@ int readXML(VasprunXML *vasprun, Configuration *config) {
 
 
    int ts_count = 0;
+   int time_start = config->time_start;
+   int time_end = config->time_end;
    vector<TimeStep>  new_timesteps;
-   cout << config->time_start << "   " << config->time_end << endl;
-   if (config->time_end > vasprun->timesteps.size()) {
+   if (time_end > vasprun->timesteps.size()) {
       screen.error << "Specified end time greater than total timesteps.";
-      config->time_end = vasprun->timesteps.size() - 1; 
+      time_end = vasprun->timesteps.size() - 1; 
    }
-   if (config->time_start > vasprun->timesteps.size()) {
+   if (time_start > vasprun->timesteps.size()) {
       screen.error << "Specified start time (time_start) greater than total timesteps";
-      config->time_start=0;
+      time_start=0;
    }
-   if (config->time_end <= config->time_start) {
+   if (time_end <= time_start) {
       screen.error << "Specified start time (time_start) is greater than end time (time_end). Disabling this feature";
-      config->time_start=0;
-      config->time_end=vasprun->timesteps.size()-1;
+      time_start=0;
+      time_end=vasprun->timesteps.size()-1;
    }
 
 
-   for (int t=config->time_start; t<=config->time_end; t++) {
+   for (int t=time_start; t<=time_end; t++) {
       new_timesteps.push_back(vasprun->timesteps[t]);
    }
    vasprun->timesteps = new_timesteps;
