@@ -104,7 +104,7 @@ int msd_wrapper(Configuration *config) {
    }
    
    //write command to plot the experimental mean square displacement
-   gnuplot.command(" 6*x*" + to_string((convert.m2A*convert.m2A/convert.to_pico)) + "*" + config->msd_reference_D + " w l ls " + gnuplot.style() + " title 'Experimental (D=" + config->msd_reference_D + ")' lw 3 " );
+   gnuplot.command(" 6*x*" + to_string((convert.m2A*convert.m2A/convert.to_pico)) + "*" + config->msd_reference_D + " w l title 'Experimental (D=" + config->msd_reference_D + ")' lc 'black' lw 3 lt 3" );
 
    gnuplot.close();
    //add a command to the global plot script to make the msd plots

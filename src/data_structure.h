@@ -506,7 +506,7 @@ struct GnuPlotScript {
    
    string style() {
       linestyle++;
-      if (linestyle >=8) {
+      if (linestyle >=24) {
          linestyle=1;
       }
       return to_string(linestyle);
