@@ -2,49 +2,15 @@ vaspruns:
 #  - label: 'sample'
 #    file: 'vasprun.xml'
 
-#  - label: 'AlN+Al,undopeid,1000K'
-#    file: vaspruns/aln/aln.xml
-
-#  - label: 'Pure Aluminum'
-#    file: 'vaspruns/pure.xml'
-#
-#  - label: '1.2wt% Zr'
-#    file: 'vaspruns/zr1.xml'
-#
-  - label: '3.3wt% Zr'
-    file: 'vaspruns/zr3.xml'
-#
-  - label: '5.4wt% Zr'
-    file: 'vaspruns/zr5.xml'
-#
-#
-  - label: '0.5wt% doped Ca'
-    file: 'vaspruns/ca1.xml'
-#
-  - label: '1.5wt% doped Ca'
-    file: 'vaspruns/ca3.xml'
-#
-  - label: '2.5wt% doped Ca'
-    file: 'vaspruns/ca5.xml'
-#
-  - label: '0.5wt%Ca+1.1wt%Zr'
-    file: 'vaspruns/cazr1.xml'
-#
-  - label: '1.4wt%Ca+3.3wt%Zr'
-    file: 'vaspruns/cazr3.xml'
-#
-  - label: '2.4wt%Ca+5.4wt%Zr'
-    file: 'vaspruns/cazr5.xml'
-
-
-
-
+  - label: 'BN 1000K'
+    file: 'vaspruns/BN1000K.xml'
 
 files:
   log: "log"
   script_wrapper: "output/make_all_plots.sh"
-  time_start: 1800
-  time_end: 4800
+  time_start: 0
+  time_end: 4800000
+  time_skip: 10 #only time consuming calculations take this into account. 
 
 
 plots:
@@ -58,15 +24,15 @@ plots:
   msd_reference_shift: 0.1 #a
   msd_filter: 'liquidal'
 
-  rdf: False
+  rdf: True
   rdf_data_prefix: "rdf_"
   rdf_filter_1: 'liquidal'
-  rdf_filter_2: 'Ca'
+  rdf_filter_2: 'liquidal'
   rdf_bins: 200
   rdf_plot_type: "lines"
 
   #Global density plots (density of the entire region occupied by rho_atoms
-  rho: False
+  rho: True
   rho_data_prefix: "rho_"
   rho_filter: 'liquidal'
   rho_experimental: 2.356  #experimental density (will be plotted for comparison) in g/cm^3
@@ -80,10 +46,10 @@ plots:
   sd_nbins_h: 75
   sd_nbins_v: 75
 
-  forces: False 
+  forces: True 
   #projections from forces_set_1 to forces_set_2
   forces_set_1: 'liquidal'
-  forces_set_2: 'liquidal'
+  forces_set_2: 'boron'
   forces_bins: 300
 
 #----------------------------------------------------------------#
@@ -122,13 +88,13 @@ atom_sets:
     filter_type: "symbol"
     criteria: "Al"
 
-  - name: 'Zr'
+  - name: 'boron'
     filter_type: "symbol"
-    criteria: " r "
+    criteria: " B "
 
-  - name: 'Ca'
+  - name: 'lattice'
     filter_type: "symbol"
-    criteria: " Ca "
+    criteria: " B N "
 
 
 

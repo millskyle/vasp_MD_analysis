@@ -50,9 +50,11 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config, Gnu
       double xmin,ymin,zmin;
       double xmax,ymax,zmax;
       double sum_volume = 0;
+      int time_counter = 0;
       //for each timestep which we have positions for
       cout << "         t=0            ";
-      for (int t=0; t < atomobject0->timesteps.size(); t++ ) {
+      for (int t=0; t < atomobject0->timesteps.size()-config->time_skip; t+=config->time_skip ) {
+         time_counter++;
          cout << "\r         t="<< t << "            ";
          cout.flush();
 
@@ -119,7 +121,7 @@ int radial_distribution_function(VasprunXML *vasprun, Configuration *config, Gnu
 
       for (int n=0; n < nbins; n++) {
          //normalization = atomic_density * (4*3.14159264*bin_cutoff[n]*bin_cutoff[n]*bin_width*atomobject->timesteps.size() );
-         normalization = atomic_density * 4.0 * 3.14159 * pow((bin_cutoff[n]),2) * bin_width  * atomobject0->timesteps.size() ; //* (atomobject0->timesteps[0].ppp.size() + atomobject1->timesteps[0].ppp.size() );
+         normalization = atomic_density * 4.0 * 3.14159 * pow((bin_cutoff[n]),2) * bin_width  * time_counter ; //* (atomobject0->timesteps[0].ppp.size() + atomobject1->timesteps[0].ppp.size() );
          //of << bin_cutoff[n] << "\t" << bins[n]/normalization/(atomobject0->timesteps[0].ppp.size() + atomobject1->timesteps[0].ppp.size() ) << "\n" ;
          of << bin_cutoff[n] << "\t" << bins[n]/normalization << "\n" ;
       }

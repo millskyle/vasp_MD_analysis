@@ -124,9 +124,12 @@ int readXML(VasprunXML *vasprun, Configuration *config) {
    xpath_node_set ns_timesteps = doc.select_nodes("//modeling/calculation");
 
 
+   int timecounter = 0;
    //for each timestep
    for (xpath_node_set::const_iterator it = ns_timesteps.begin(); it != ns_timesteps.end(); ++it) {
       TimeStep thisStep;
+      thisStep.realTime = timecounter;
+      timecounter++;
       //get stress tensor:
       ns_temp = it->node().select_nodes(".//varray[@name='stress']/v");
       vector<string> this_row;

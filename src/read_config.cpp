@@ -103,6 +103,10 @@ void parse_inputfile(Configuration& config, const Node& node) {
 
    parse(files, "time_start", config.time_start);
    parse(files, "time_end", config.time_end);
+   parse(files, "time_skip", config.time_skip);
+   if (config.time_skip <=0 ) {
+      config.time_skip = 1;
+   }
    
    cout << config.time_start << "   " << config.time_end << endl;
 

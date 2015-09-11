@@ -53,6 +53,7 @@ struct INCAR {
 };
 
 struct TimeStep {
+   int realTime;
    vector<threevector> ppp;
    vector<threevector> ppp_uw; //unwrapped
    vector<threevector> fff;
@@ -406,6 +407,7 @@ struct Configuration {
    
    int time_start ; 
    int time_end ; 
+   int time_skip;
    
    string tempstr;
   
