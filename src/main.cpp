@@ -71,11 +71,12 @@ int main() {
    if (config.rho) {
       global_density(&v, &config);
    }
-   if (config.spatial_distribution_projection) {
-      spatial_distribution_projection(&v, &config);
-   }
 
    */
+   if (config.spatial_distribution_projection) {
+      spatial_distribution_projection(&config.vaspruns[0], &config);
+   }
+
 
 
    config.script_wrapper.close();
