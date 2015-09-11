@@ -2,13 +2,22 @@ vaspruns:
 #  - label: 'sample'
 #    file: 'vasprun.xml'
 
-  - label: 'BN 1000K'
-    file: 'vaspruns/BN1000K.xml'
+  - label: 'Pure Aluminum'
+    file: 'vaspruns/pureAl1000K.xml'
+
+#  - label: 'BN 1000K'
+#    file: 'vaspruns/BN1000K.xml'
+
+#  - label: 'AlN 1000K'
+#    file: 'vaspruns/AlN1000K.xml'
+
+#  - label: 'AlN 2000K'
+#    file: 'vaspruns/AlN2000K.xml'
 
 files:
   log: "log"
   script_wrapper: "output/make_all_plots.sh"
-  time_start: 0
+  time_start: 1500
   time_end: 4800000
   time_skip: 10 #only time consuming calculations take this into account. 
 
@@ -49,8 +58,8 @@ plots:
   forces: True 
   #projections from forces_set_1 to forces_set_2
   forces_set_1: 'liquidal'
-  forces_set_2: 'boron'
-  forces_bins: 300
+  forces_set_2: 'liquidal'
+  forces_bins: 600
 
 #----------------------------------------------------------------#
 # FILTERS

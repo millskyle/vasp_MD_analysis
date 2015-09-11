@@ -63,15 +63,16 @@ int main() {
    if (config.msd) {
       msd_wrapper(&config);
    }
+   
+   if (config.forces) {
+      force_bond_projections_wrapper(&config);
+   }
 /*
    if (config.rho) {
       global_density(&v, &config);
    }
    if (config.spatial_distribution_projection) {
       spatial_distribution_projection(&v, &config);
-   }
-   if (config.forces) {
-      force_bond_projections(&v, &config);
    }
 
    */

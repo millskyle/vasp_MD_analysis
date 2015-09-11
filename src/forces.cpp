@@ -7,14 +7,8 @@
 
 
 
-int force_bond_projections(VasprunXML *vasprun, Configuration *config) {
+int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotScript* gnuplot) {
    if (!config->forces) {cout << "\nForce projection called but not requested in configuration. Exiting"; return 1;}   
-   screen.status << "Force Projections";
-   screen.step << "Bond force projections requested."; 
-   
-   //Make a gnuplot object.  It takes care of writing the data to a script.
-   GnuPlotScript gnuplot ;
-   gnuplot.initialise("forces","Force","Separation distance [Angstrom]","Average force [eV/Angstrom]","force.pdf");
 
    atomType *atomobject0;
    atomType *atomobject1;
@@ -50,8 +44,10 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config) {
       //for each valid timestep
    int counter=0;
 
-
+   cout << "        t = 0         0.00%     " ;
    for (int t=0; t < atomobject1->timesteps.size()-2; t++ ) {   // -2 as the last timestep could be incomplete
+      cout << "\r        t = " << t << "         " << t*100.0/(atomobject1->timesteps.size()-2) << "%       " ;
+      cout.flush();
       for (int a=0; a<atomobject1->timesteps[0].ppp.size(); a++) {
          for (int b=0; b<atomobject0->timesteps[0].ppp.size(); b++) {
             //vector between the two atoms
@@ -92,14 +88,16 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config) {
          } 
       }
    }
+   cout << "\r";
 
    screen.data("Separation distances","");
    screen.data("   Minimum",min_distance);
    screen.data("   Maximum",max_distance);
+
+   cout << "binning atoms"
    
    //gnuplot.command("set xrange [" + to_string(min_distance) + ":]"); 
 //   gnuplot.command("set xrange [0:]"); // + to_string(min_distance) + ":]"); 
-   gnuplot.command("set style fill transparent solid 0.40 noborder");
 
    //make vectors that are the correct size (ie: number of bins)
    //to hold the data
@@ -137,13 +135,10 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config) {
       bins_std_dev[i] = sqrt(bins_std_dev[i]) / bins_count[i];
    }
 
-
-   gnuplot.command("plot ",false);
-   
    //write out the gnuplot command
-   gnuplot.command(  
-      + " 'forces.data' using 1:($2-$3):($2+$3) with filledcurves lc rgb '#D1D1D1' lw 0, '' using 1:2 w l ls " 
-      + gnuplot.style() 
+   gnuplot->command(  
+      + " 'forces_" + vasprun->label + ".data' using 1:($2-$3):($2+$3) with filledcurves lc rgb '#D1D1D1' lw 0 title '" + vasprun->label + "' ,  '' using 1:2 w l ls " 
+      + gnuplot->style() 
       + " lw 2 "
       ,false);
 
@@ -158,7 +153,7 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config) {
    
    //write out the data for this element to an element-specific file
    ofstream of;
-   of.open("output/forces.data");     
+   of.open("output/forces_" + vasprun->label + ".data");     
    for (int i=0; i <= bins_sum.size(); i++) {
       if (bins_count[i]>0) {
          if (i*bin_width < smallest_dimension/2.0) {
@@ -170,16 +165,33 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config) {
    of.close();
 
    
-//201508   }
-
-   gnuplot.close();
-   //add a command to the global plot script to make the msd plots
-   config->script_wrapper << "\ngnuplot plot_forces.gnu \n" ;   
-
    return 0;
 
 }
 
+int force_bond_projections_wrapper(Configuration *config) {
+   screen.status << "Force Projections";
+   screen.step << "Bond force projections requested."; 
+   
+   //Make a gnuplot object.  It takes care of writing the data to a script.
+   GnuPlotScript gnuplot ;
+   gnuplot.initialise("forces","Force","Separation distance [Angstrom]","Average force [eV/Angstrom]","force.pdf");
+   gnuplot.command("set style fill transparent solid 0.40 noborder");
+   gnuplot.command("set yrange [-10:10]");
+   gnuplot.command("plot 0 lc rgb '#CCCCCC',  ", false );
+
+
+   for (int i=0; i<config->vaspruns.size(); i++) {
+      force_bond_projections(&config->vaspruns[i], config, &gnuplot);
+   }
+
+   gnuplot.close();
+
+   config->script_wrapper << "\ngnuplot plot_forces.gnu \n ";
+
+   return 0;
+
+}
 
 
 
