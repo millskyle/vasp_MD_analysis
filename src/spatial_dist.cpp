@@ -58,11 +58,12 @@ int spatial_distribution_projection(VasprunXML *vasprun, Configuration *config) 
       bins.push_back(dummy_row);
    }
 
+     
 
 
 
 
-     atomType* staticatoms = &(config->atomfilters[config->sd_static_filter].atoms.atoms);
+     atomType* staticatoms = &(vasprun->atomfilters[config->sd_static_filter].atoms.atoms);
      double static_atom_coords_1[staticatoms->timesteps[0].ppp.size()];
      double static_atom_coords_2[staticatoms->timesteps[0].ppp.size()];
 
@@ -83,7 +84,7 @@ int spatial_distribution_projection(VasprunXML *vasprun, Configuration *config) 
    //For each atom in the requested atom types
 //   for (int atomname=0; atomname < config->liquid_atoms.size(); atomname++) {
       //this pointer will point to the atomType object for this type of atom 
-      atomType* dynamicatoms = &(config->atomfilters[config->sd_dynamic_filter].atoms.atoms); 
+      atomType* dynamicatoms = &(vasprun->atomfilters[config->sd_dynamic_filter].atoms.atoms); 
 
 
 
@@ -91,7 +92,7 @@ int spatial_distribution_projection(VasprunXML *vasprun, Configuration *config) 
       
       //for each timestep
       for (int t=0; t < dynamicatoms->timesteps.size(); t++ ) {
-         //for each atom in the timestep
+         //for each atom in the timestepi
          for (int a=0; a<dynamicatoms->timesteps[t].ppp.size(); a++) {
             //get the bin index in which the atom falls
             //   ie: take the x coordinate and divide by the bin width, round to nearest integer.
