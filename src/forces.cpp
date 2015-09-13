@@ -14,8 +14,8 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
    atomType *atomobject0;
    atomType *atomobject1;
 
-   atomobject0 = &(config->atomfilters[config->forces_set_1.c_str()].atoms.atoms);
-   atomobject1 = &(config->atomfilters[config->forces_set_2.c_str()].atoms.atoms);
+   atomobject0 = &(vasprun->atomfilters[config->forces_set_1.c_str()].atoms.atoms);
+   atomobject1 = &(vasprun->atomfilters[config->forces_set_2.c_str()].atoms.atoms);
    
 
    double dx,dy,dz,fx0,fy0,fz0,fx1,fy1,fz1; //components of the vectors between atoms
@@ -214,6 +214,7 @@ int force_bond_projections_wrapper(Configuration *config) {
 
 
    for (int i=0; i<config->vaspruns.size(); i++) {
+      screen.step << config->vaspruns[i].label; 
       force_bond_projections(&config->vaspruns[i], config, &gnuplot);
    }
 
