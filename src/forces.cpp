@@ -10,7 +10,6 @@
 int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotScript* gnuplot) {
    if (!config->forces) {cout << "\nForce projection called but not requested in configuration. Exiting"; return 1;}   
 
-   cout << "HERE" << endl;
 
    atomType *atomobject0;
    atomType *atomobject1;
@@ -24,8 +23,21 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
    double distance, total_proj;
    vector<vector<double>> all_data;
    vector<double> thisdata;
-   double max_distance=0;
- 
+
+   
+
+   double max_distance = 
+     max(
+          (pow(vasprun->latt[0][0],2) + pow(vasprun->latt[0][1],2) + pow(vasprun->latt[0][2],2) ), 
+          max(
+               (pow(vasprun->latt[1][0],2) + pow(vasprun->latt[1][1],2) + pow(vasprun->latt[1][2],2) ), 
+               (pow(vasprun->latt[2][0],2) + pow(vasprun->latt[2][1],2) + pow(vasprun->latt[2][2],2) )
+             )
+        );
+     max_distance = sqrt(max_distance)/1.9;
+
+  int total_timesteps = floor(atomobject1->timesteps.size()/config->time_skip) ;
+
  //2015-09-11
   //make vectors that are the correct size (ie: number of bins)
    //to hold the data
@@ -45,20 +57,8 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
 
    double min_distance=100000000;
 
-   cout << "HERE" << endl;
+   int number_of_projections = 2*atomobject1->timesteps[0].ppp.size()*atomobject0->timesteps[0].ppp.size()*(atomobject1->timesteps.size());
 
-   cout << atomobject1->timesteps[0].ppp.size() << endl;
-   cout << atomobject0->timesteps[0].ppp.size() << endl;
-   cout << (atomobject1->timesteps.size()-2) << endl ;
-
-   int number_of_projections = 2*atomobject1->timesteps[0].ppp.size()*atomobject0->timesteps[0].ppp.size()*(atomobject1->timesteps.size()-2);
-   cout << "HERE" << endl;
-
-
-
-//   double all_data_array[number_of_projections][2];
-
-   cout << "array declared" << endl;
 
    screen.step << "Beginning force projection."; 
 
@@ -76,13 +76,12 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
    int counter=0;
    int thisBin;
    cout << "        t = 0         0.00%     " ;
-   for (int t=0; t < atomobject1->timesteps.size()-2; t++ ) {   // -2 as the last timestep could be incomplete
-      cout << "\r        t = " << t << "         " << t*100.0/(atomobject1->timesteps.size()-2) << "%       " ;
+   for (int t=0; t < (atomobject1->timesteps.size() - config->time_skip); t+=config->time_skip ) {   // -2 as the last timestep could be incomplete
+      cout << "\r        t = " << t << "         " << t*100.0/(atomobject1->timesteps.size()) << "%       " ;
       cout.flush();
       for (int a=0; a<atomobject1->timesteps[0].ppp.size(); a++) {
          for (int b=0; b<atomobject0->timesteps[0].ppp.size(); b++) {
             //vector between the two atoms
-            cout << "1" << endl;
             dx = atomobject0->timesteps[t].ppp[b][0] - atomobject1->timesteps[t].ppp[a][0];
             dy = atomobject0->timesteps[t].ppp[b][1] - atomobject1->timesteps[t].ppp[a][1];
             dz = atomobject0->timesteps[t].ppp[b][2] - atomobject1->timesteps[t].ppp[a][2];
@@ -91,10 +90,9 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
             dy = dy - nint(dy / vasprun->latt[1][1])*vasprun->latt[1][1];
             dz = dz - nint(dz / vasprun->latt[2][2])*vasprun->latt[2][2];
             //distance between both atoms:
-            cout << "2" << endl;
             distance = sqrt(dx*dx + dy*dy + dz*dz);
-            max_distance = max(distance, max_distance);
-            min_distance = min(distance, min_distance);
+            //////max_distance = max(distance, max_distance);
+            //////min_distance = min(distance, min_distance);
 
             //if (distance > max_distance) { max_distance = distance; }
             //if (distance < min_distance) { min_distance = distance; }
@@ -107,7 +105,6 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
             fy1 = atomobject1->timesteps[t].fff[a][1];
             fz1 = atomobject1->timesteps[t].fff[a][2];
            
-            cout << "3" << endl;
             //project them
             // (F dot r) / |r|
             proj0 = (fx0*dx + fy0*dy + fz0*dz)/distance;
@@ -121,7 +118,6 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
             counter ++; 
       //for each data point, put it in the correct bin and increment the bin counter
    //for (int i=0; i<number_of_projections-2; i++) { 
-            cout << "4" << endl;
             thisBin = floor(distance / bin_width);
             bins_count[thisBin]+=2;
             bins_sum[thisBin]+= -proj1;
@@ -129,17 +125,14 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
 
    //}
 
-         
-
-
          } 
       }
    }
-   cout << "\r";
+   cout << "\r" << endl;
 
-   screen.data("Separation distances","");
-   screen.data("   Minimum",min_distance);
-   screen.data("   Maximum",max_distance);
+///   screen.data("Separation distances","");
+///   screen.data("   Minimum",min_distance);
+///   screen.data("   Maximum",max_distance);
 
    
    //gnuplot.command("set xrange [" + to_string(min_distance) + ":]"); 
@@ -160,12 +153,25 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
 //      bins_std_dev[i] = sqrt(bins_std_dev[i]) / bins_count[i];
 //   }
 
-   //write out the gnuplot command
    gnuplot->command(  
-      + " 'forces_" + vasprun->label + ".data' using 1:($2-$3):($2+$3) with filledcurves lc rgb '#D1D1D1' lw 0 title '" + vasprun->label + "' ,  '' using 1:2 w l ls " 
+      + " 'forces_" 
+      + vasprun->label 
+      + ".data' using 1:2 w l ls " 
+      + gnuplot->style() 
+      + " title '" 
+      + vasprun->label 
+      + "', "
+      ,false);
+   
+/* This was used before to plot the standard deviation.  I had to change the calculation, so standard
+deviation is only possible to calculate with a two-pass calculation 
+  //write out the gnuplot command
+   gnuplot->command(  
+      + " 'forces_" + vasprun->label + ".data' using 1:($2-$3):($2+$3) with filledcurves lc rgb '#D1D1D1' lw 0 title '" + vasprun->label + "' ,  '' using 1:2 w l ls 1 " 
       + gnuplot->style() 
       + " lw 2 "
       ,false);
+   */
 
    float smallest_dimension;
    smallest_dimension = vasprun->latt[0][0];
