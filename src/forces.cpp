@@ -158,7 +158,7 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
       + vasprun->label 
       + ".data' using 1:2 w l ls " 
       + gnuplot->style() 
-      + " title '" 
+      + " lw 2  title '" 
       + vasprun->label 
       + "', "
       ,false);
@@ -173,6 +173,8 @@ deviation is only possible to calculate with a two-pass calculation
       ,false);
    */
 
+   cout << "HERE" << endl;
+
    float smallest_dimension;
    smallest_dimension = vasprun->latt[0][0];
    if (vasprun->latt[1][1] < smallest_dimension) {
@@ -181,13 +183,22 @@ deviation is only possible to calculate with a two-pass calculation
    if (vasprun->latt[2][2] < smallest_dimension) {
       smallest_dimension = vasprun->latt[2][2];
    }
+  // cout << "HERE" << bins_sum.size() << endl;
+  
    
    //write out the data for this element to an element-specific file
    ofstream of;
+
+  // cout << "ofstream of;" << endl;
+
+
    of.open("output/forces_" + vasprun->label + ".data");     
-   for (int i=0; i <= bins_sum.size(); i++) {
+   //cout << "FILE OPENED" << endl;
+   for (int i=0; i < bins_sum.size(); i++) {
+//      cout << "i=" << i <<  endl;
       if (bins_count[i]>0) {
          if (i*bin_width < smallest_dimension/2.0) {
+  //          cout << "E" << endl;
 //            cout << bins_count[i] << endl;
             of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << 0 << "\n";
             //of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << bins_std_dev[i] << "\n";
@@ -196,6 +207,7 @@ deviation is only possible to calculate with a two-pass calculation
    }
    of.close();
 
+//   cout << "HERE" << endl;
    
    return 0;
 

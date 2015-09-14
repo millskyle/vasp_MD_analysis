@@ -5,11 +5,11 @@ vaspruns:
 #  - label: 'Pure Aluminum'
 #    file: 'vaspruns/pureAl1000K.xml'
 
-  - label: 'BN 1000K'
-    file: 'vaspruns/BN1000K.xml'
+#  - label: 'BN 1000K'
+#    file: 'vaspruns/BN1000K.xml'
 
-#  - label: 'AlN 1000K'
-#    file: 'vaspruns/AlN1000K.xml'
+  - label: 'AlN 1000K'
+    file: 'vaspruns/AlN1000K.xml'
 
 #  - label: 'AlN 2000K'
 #    file: 'vaspruns/AlN2000K.xml'
@@ -17,7 +17,7 @@ vaspruns:
 files:
   log: "log"
   script_wrapper: "output/make_all_plots.sh"
-  time_start: 1500
+  time_start: 800
   time_end: 4800000
   time_skip: 1 #only time consuming calculations take this into account. 
 
@@ -33,7 +33,7 @@ plots:
   msd_reference_shift: 0.1 #a
   msd_filter: 'liquidal'
 
-  rdf: False
+  rdf: False 
   rdf_data_prefix: "rdf_"
   rdf_filter_1: 'liquidal'
   rdf_filter_2: 'liquidal'
@@ -58,8 +58,8 @@ plots:
   forces: True 
   #projections from forces_set_1 to forces_set_2
   forces_set_1: 'liquidal'
-  forces_set_2: 'liquidal'
-  forces_bins: 600
+  forces_set_2: 'lattAl'
+  forces_bins: 1200  
 
 #----------------------------------------------------------------#
 # FILTERS
@@ -94,16 +94,20 @@ plots:
 
 atom_sets:
   - name: 'liquidal'
-    filter_type: "symbol"
-    criteria: "Al"
+    filter_type: "index_range"
+    criteria: "128:427"
 
-  - name: 'boron'
-    filter_type: "symbol"
-    criteria: " B "
+  - name: 'lattN'
+    filter_type: "index_range"
+    criteria: "0:63"
+
+  - name: 'lattAl'
+    filter_type: "index_range"
+    criteria: "64:127"
 
   - name: 'lattice'
-    filter_type: "symbol"
-    criteria: " B N "
+    filter_type: "index_range"
+    criteria: "0:127"
 
 
 
