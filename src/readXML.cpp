@@ -31,6 +31,9 @@ bool update_3d_vector(vector<threevector>* objectToUpdate, float x, float y, flo
 int readXML(VasprunXML *vasprun, Configuration *config) {
    float x, y, z;
    vector<float> r;
+   r.push_back(0);
+   r.push_back(0);
+   r.push_back(0);
 
    xml_document doc;
    screen.status << "Loading file into memory";
@@ -119,10 +122,8 @@ int readXML(VasprunXML *vasprun, Configuration *config) {
 
 
    xpath_node_set ns_temp;
-
    //Iterate over each timestep
    xpath_node_set ns_timesteps = doc.select_nodes("//modeling/calculation");
-
 
    int timecounter = 0;
    //for each timestep
@@ -153,19 +154,19 @@ int readXML(VasprunXML *vasprun, Configuration *config) {
          n_temp = it->node().select_nodes(".//structure/varray[@name='positions']")[0].node();
          for (xml_node thisNode = n_temp.child("v"); thisNode; thisNode = thisNode.next_sibling("v")) {
             sscanf(thisNode.child_value(), "  %f  %f  %f ", &x, &y, &z );
-            vector<float> r;
-            r.push_back(x*vasprun->latt[0][0]);
-            r.push_back(y*vasprun->latt[1][1]);
-            r.push_back(z*vasprun->latt[2][2]);
+            r[0] = 0; r[1] = 0; r[2] = 0;
+            r[0] = x*vasprun->latt[0][0];
+            r[1] = y*vasprun->latt[1][1];
+            r[2] = z*vasprun->latt[2][2];
             thisStep.ppp.push_back(r);
             }
          n_temp = it->node().select_nodes(".//varray[@name='forces']")[0].node();
          for (xml_node thisNode = n_temp.child("v"); thisNode; thisNode = thisNode.next_sibling("v")) {
             sscanf(thisNode.child_value(), "  %f  %f  %f ", &x, &y, &z );
-            vector<float> r;
-            r.push_back(x*vasprun->latt[0][0]);
-            r.push_back(y*vasprun->latt[1][1]);
-            r.push_back(z*vasprun->latt[2][2]);
+            r[0] = 0; r[1] = 0; r[2] = 0;
+            r[0] = x*vasprun->latt[0][0];
+            r[1] = y*vasprun->latt[1][1];
+            r[2] = z*vasprun->latt[2][2];
             thisStep.fff.push_back(r);
             }
          vasprun->timesteps.push_back(thisStep);

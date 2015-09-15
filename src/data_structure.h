@@ -434,6 +434,11 @@ struct Configuration {
    string sd_dynamic_filter;
    string sd_static_filter;
 
+   bool sd_wrap;
+   double sd_h_wrap_dist,sd_v_wrap_dist;
+   int sd_h_wrap_times,sd_v_wrap_times;
+
+
    bool rdf;
    string rdf_filter_1;
    string rdf_filter_2;
@@ -522,6 +527,7 @@ struct GnuPlotScript {
          script << "\n";
       } 
    }
+
    void initialise(string iname,string ititle,string ixlabel,string iylabel,string ioutput, string icmap="Set2") {
       name = iname;
       title = ititle;
@@ -543,6 +549,11 @@ struct GnuPlotScript {
    void close() {
       script.close();
    }
+   void term(string terminal, string ioutput) {
+      script << "set term " << terminal << " \n";
+      script << "set output \"" << ioutput << "\"\n";
+   }
+
 };
 
 #endif

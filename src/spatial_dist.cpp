@@ -11,9 +11,8 @@ int spatial_distribution_projection(VasprunXML *vasprun, Configuration *config) 
    
    //Start a simple bash script which calls GNUplot to plot the msd data
    GnuPlotScript gnuplot;
-   gnuplot.initialise("sdp","Spatial Distribution","x [Angstrom]","y [Angstrom]","sdp.pdf", "YlOrRd");
-
-
+   gnuplot.initialise("sdp","Spatial Distribution","x [Angstrom]","y [Angstrom]","sdp.png", "YlOrRd");
+   gnuplot.term(" png font \"Times,12\" size 1920,1080 ","sdp.png");
 
    int nbins_h = config->sd_nbins_h;
    int nbins_v = config->sd_nbins_v;
@@ -42,7 +41,7 @@ int spatial_distribution_projection(VasprunXML *vasprun, Configuration *config) 
    gnuplot.command("set yrange [0:" + to_string(vasprun->latt[dim2][dim2]) + "] ");
    
    gnuplot.command("set pm3d map");
-   gnuplot.command("set pm3d interpolate 0,0");
+//   gnuplot.command("set pm3d interpolate 0,0");
    gnuplot.command("set size ratio -1");
    gnuplot.command("set key off");
 
@@ -92,28 +91,55 @@ int spatial_distribution_projection(VasprunXML *vasprun, Configuration *config) 
       
       //for each timestep
       for (int t=0; t < dynamicatoms->timesteps.size(); t++ ) {
+         cout << " t = " << t << endl;
          //for each atom in the timestepi
          for (int a=0; a<dynamicatoms->timesteps[t].ppp.size(); a++) {
+//         cout << " a = " << a << endl;
+            for (int xx=0; xx<config->sd_h_wrap_times; xx++) {
+              
+               for (int yy=0; yy<config->sd_v_wrap_times; yy++) {
+                  ix = nint((dynamicatoms->timesteps[t].ppp[a][dim1] + xx*config->sd_h_wrap_dist) / (vasprun->latt[dim1][dim1] / nbins_h));
+                  iy = nint((dynamicatoms->timesteps[t].ppp[a][dim2] + yy*config->sd_v_wrap_dist) / (vasprun->latt[dim2][dim2] / nbins_v));
+                  while (ix >= nbins_h) {
+                     ix = ix - nbins_h;
+                  }
+                  while (iy >= nbins_v) {
+                     iy = iy - nbins_v;
+                  }
+               bins[ix][iy]++;
+               
+               }
+            }
             //get the bin index in which the atom falls
             //   ie: take the x coordinate and divide by the bin width, round to nearest integer.
-            ix = nint(dynamicatoms->timesteps[t].ppp[a][dim1] / (vasprun->latt[dim1][dim1] / nbins_h));
-            iy = nint(dynamicatoms->timesteps[t].ppp[a][dim2] / (vasprun->latt[dim2][dim2] / nbins_v));
-            bins[ix][iy]++;
+            //ix = nint(dynamicatoms->timesteps[t].ppp[a][dim1] / (vasprun->latt[dim1][dim1] / nbins_h));
+//            iy = nint(dynamicatoms->timesteps[t].ppp[a][dim2] / (vasprun->latt[dim2][dim2] / nbins_v));
+//            bins[ix][iy]++;
          }
        }
    //} 
 
    
    double norm;
-   norm = (vasprun->latt[dim1][dim1] / nbins_h) * (vasprun->latt[dim2][dim2] / nbins_v) * vasprun->latt[config->sd_collapse_dimension][config->sd_collapse_dimension] * dynamicatoms->timesteps.size() * vasprun->dt;
+   norm = (vasprun->latt[dim1][dim1] / nbins_h) 
+      * (vasprun->latt[dim2][dim2] / nbins_v) 
+      * vasprun->latt[config->sd_collapse_dimension][config->sd_collapse_dimension] 
+      * config->sd_h_wrap_times 
+      * config->sd_v_wrap_times 
+      * dynamicatoms->timesteps.size() * vasprun->dt;
  
    ofstream of;
    of.open("output/sdp_dyn.data");
 
-   for (int ix=0; ix < nbins_h-1; ix++){
+   for (int ix=0; ix < nbins_h; ix++){
    //for each bin in the y direction
-      for (int iy=0; iy < nbins_v-1; iy++) {
-         of << bins[ix][iy] / norm << "\t" ;
+      for (int iy=0; iy < nbins_v; iy++) {
+//         if (bins[ix][iy]/norm <= 0.06 ) {
+//            of << "0.00\t" ; 
+//         } else {
+            of << pow(bins[nbins_h - ix][nbins_v - iy],4) / norm << "\t" ;
+//         }
+
       }
       of << "\n";
    }
@@ -122,17 +148,19 @@ int spatial_distribution_projection(VasprunXML *vasprun, Configuration *config) 
    of.open("output/sdp_sta.data");
    int halftime = staticatoms->timesteps.size()/2;
    for (int i=0; i<staticatoms->timesteps[0].ppp.size(); i++) {
-      of << staticatoms->timesteps[halftime].ppp_uw[i][dim1] << "\t" << staticatoms->timesteps[halftime].ppp_uw[i][dim2]   <<"\t" <<  atomic_symbol_to_number(staticatoms->symbols[i])/10. << "\n";
+      of << staticatoms->timesteps[halftime].ppp_uw[i][dim2] << "\t" << staticatoms->timesteps[halftime].ppp_uw[i][dim1]   <<"\t" <<  atomic_symbol_to_number(staticatoms->symbols[i])/2. << "\n";
    }
 
    of.close();
+
+//   gnuplot.command("set palette model RGB defined ( 5 '#FFC4EB', 12 '#222222', 13 '#CECECE', 7 '#0028FF'  )");
 
       //write out the gnuplot command, scaling the x-axis increment by the timestep to get it in picoseconds
    gnuplot.command("splot 'sdp_dyn.data' using ($1 * " 
          + to_string(vasprun->latt[dim1][dim1] / nbins_h)
          + "):($2 * "
          + to_string(vasprun->latt[dim2][dim2] / nbins_v)
-         + "):3  matrix, 'sdp_sta.data' using 1:2:(0):3 w points pt 6 lt 1 ps variable lc 'black' "         
+         + "):3  matrix, 'sdp_sta.data' using 1:2:(0):3 w points pt 6 lt 1 ps variable palette  "         
          );
 
 
@@ -143,6 +171,8 @@ int spatial_distribution_projection(VasprunXML *vasprun, Configuration *config) 
    config->script_wrapper << "\ngnuplot plot_sdp.gnu \n" ;
 
    return 0;
+
+
 
 }
 

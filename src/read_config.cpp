@@ -95,6 +95,15 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "sd_nbins_v", config.sd_nbins_v);
    parse(plots, "sd_nbins_h", config.sd_nbins_h);
 
+   parse(plots, "sd_wrap", config.sd_wrap);
+   parse(plots, "sd_h_wrap_dist", config.sd_h_wrap_dist);
+   parse(plots, "sd_v_wrap_dist", config.sd_v_wrap_dist);
+   parse(plots, "sd_h_wrap_times", config.sd_h_wrap_times);
+   parse(plots, "sd_v_wrap_times", config.sd_v_wrap_times);
+
+
+
+
    parse(plots, "forces", config.forces);
    parse(plots, "forces_bins", config.forces_bins);
    parse(plots, "forces_set_1", config.forces_set_1);

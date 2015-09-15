@@ -5,11 +5,13 @@ vaspruns:
 #  - label: 'Pure Aluminum'
 #    file: 'vaspruns/pureAl1000K.xml'
 
-#  - label: 'BN 1000K'
-#    file: 'vaspruns/BN1000K.xml'
+  - label: 'BN 1000K'
+    file: 'vaspruns/BN1000K.xml'
+#  - label: 'oldBN1400K'
+#    file: 'vaspruns/oldBN1400K.xml'
 
-  - label: 'AlN 1000K'
-    file: 'vaspruns/AlN1000K.xml'
+#  - label: 'AlN 1000K'
+#    file: 'vaspruns/AlN1000K.xml'
 
 #  - label: 'AlN 2000K'
 #    file: 'vaspruns/AlN2000K.xml'
@@ -52,13 +54,22 @@ plots:
   sd_dynamic_filter: 'liquidal'
 #atoms in the static_filter set will be plotted explicitly at their average position on the plot
   sd_static_filter: 'lattice'
-  sd_nbins_h: 75
-  sd_nbins_v: 75
+  sd_nbins_h: 200
+  sd_nbins_v: 200
 
-  forces: True 
+  sd_wrap: True
+#  sd_h_wrap_dist: 4.338
+  sd_h_wrap_dist: 4.338
+  sd_v_wrap_dist: 2.50  #sqrt(3) * 1.446
+  sd_h_wrap_times: 4
+  sd_v_wrap_times: 8 
+
+
+
+  forces: False
   #projections from forces_set_1 to forces_set_2
-  forces_set_1: 'liquidal'
-  forces_set_2: 'lattAl'
+  forces_set_1: 'liquidal_sym'
+  forces_set_2: 'boron_sym'
   forces_bins: 1200  
 
 #----------------------------------------------------------------#
@@ -93,6 +104,13 @@ plots:
 #            
 
 atom_sets:
+#  - name: 'liquidal_sym'
+#    filter_type: "symbol"
+#    criteria: "Al"
+#  - name: 'boron_sym'
+#    filter_type: 'symbol'
+#    criteria: 'B'
+
   - name: 'liquidal'
     filter_type: "index_range"
     criteria: "128:427"
