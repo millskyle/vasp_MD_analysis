@@ -7,6 +7,7 @@ vaspruns:
 
   - label: 'BN 1000K'
     file: 'vaspruns/BN1000K.xml'
+
 #  - label: 'oldBN1400K'
 #    file: 'vaspruns/oldBN1400K.xml'
 
@@ -19,8 +20,8 @@ vaspruns:
 files:
   log: "log"
   script_wrapper: "output/make_all_plots.sh"
-  time_start: 800
-  time_end: 4800000
+  time_start: 2500
+  time_end: 600000
   time_skip: 1 #only time consuming calculations take this into account. 
 
 
@@ -48,29 +49,34 @@ plots:
   rho_filter: 'liquidal'
   rho_experimental: 2.356  #experimental density (will be plotted for comparison) in g/cm^3
 
-  sd_projection: True
-  sd_collapse_dimension: 2
+  sd_projection: False
+  sd_collapse_dimension: 2 
 #dynamic_filter is the set of atoms that will be collapsed/binned
   sd_dynamic_filter: 'liquidal'
 #atoms in the static_filter set will be plotted explicitly at their average position on the plot
   sd_static_filter: 'lattice'
-  sd_nbins_h: 200
-  sd_nbins_v: 200
+  sd_nbins_h: 75
+  sd_nbins_v: 75
 
   sd_wrap: True
-#  sd_h_wrap_dist: 4.338
+ #AlN:
+#  sd_h_wrap_dist: 5.67
+#  sd_v_wrap_dist: 3.2735  #sqrt(3) * 1.446
+
+#BN
   sd_h_wrap_dist: 4.338
-  sd_v_wrap_dist: 2.50  #sqrt(3) * 1.446
+  sd_v_wrap_dist: 2.505  #sqrt(3) * 1.446
+
   sd_h_wrap_times: 4
   sd_v_wrap_times: 8 
 
 
 
-  forces: False
+  forces: True
   #projections from forces_set_1 to forces_set_2
-  forces_set_1: 'liquidal_sym'
-  forces_set_2: 'boron_sym'
-  forces_bins: 1200  
+  forces_set_1: 'liquidal'
+  forces_set_2: 'lattB'
+  forces_bins: 600  
 
 #----------------------------------------------------------------#
 # FILTERS
@@ -104,13 +110,6 @@ plots:
 #            
 
 atom_sets:
-#  - name: 'liquidal_sym'
-#    filter_type: "symbol"
-#    criteria: "Al"
-#  - name: 'boron_sym'
-#    filter_type: 'symbol'
-#    criteria: 'B'
-
   - name: 'liquidal'
     filter_type: "index_range"
     criteria: "128:427"
@@ -119,18 +118,8 @@ atom_sets:
     filter_type: "index_range"
     criteria: "0:63"
 
-  - name: 'lattAl'
+  - name: 'lattB'
     filter_type: "index_range"
     criteria: "64:127"
-
-  - name: 'lattice'
-    filter_type: "index_range"
-    criteria: "0:127"
-
-
-
-
-
-
 
 
