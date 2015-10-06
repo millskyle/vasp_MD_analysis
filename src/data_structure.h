@@ -451,6 +451,7 @@ struct Configuration {
    int forces_bins;
    string forces_set_1;
    string forces_set_2;
+   string forces_yrange;
 
    vector<string> filter_name_list;
 

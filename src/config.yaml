@@ -5,14 +5,14 @@ vaspruns:
 #  - label: 'Pure Aluminum'
 #    file: 'vaspruns/pureAl1000K.xml'
 
-  - label: 'BN 1000K'
-    file: 'vaspruns/BN1000K.xml'
+#  - label: 'BN 1000K'
+#    file: 'vaspruns/BN1000K.xml'
 
 #  - label: 'oldBN1400K'
 #    file: 'vaspruns/oldBN1400K.xml'
 
-#  - label: 'AlN 1000K'
-#    file: 'vaspruns/AlN1000K.xml'
+  - label: 'AlN 1000K'
+    file: 'vaspruns/AlN1000K.xml'
 
 #  - label: 'AlN 2000K'
 #    file: 'vaspruns/AlN2000K.xml'
@@ -30,7 +30,7 @@ plots:
   e_t_start_timestep: 200
 
 
-  msd: False 
+  msd: False  
   msd_data_prefix: "msd_"
   msd_reference_D: 7.5e-9 #diffusion coefficient to plot alongside data (for reference)
   msd_reference_shift: 0.1 #a
@@ -70,13 +70,12 @@ plots:
   sd_h_wrap_times: 4
   sd_v_wrap_times: 8 
 
-
-
   forces: True
   #projections from forces_set_1 to forces_set_2
   forces_set_1: 'liquidal'
-  forces_set_2: 'lattB'
-  forces_bins: 600  
+  forces_set_2: 'lattN'
+  forces_bins: 300   
+  forces_yrange: "[-10:11]"
 
 #----------------------------------------------------------------#
 # FILTERS
@@ -113,12 +112,15 @@ atom_sets:
   - name: 'liquidal'
     filter_type: "index_range"
     criteria: "128:427"
+#  - name: 'liquidal'
+#    filter_type: "symbol"
+#    criteria: "Al"
 
   - name: 'lattN'
     filter_type: "index_range"
     criteria: "0:63"
 
-  - name: 'lattB'
+  - name: 'lattAl'
     filter_type: "index_range"
     criteria: "64:127"
 

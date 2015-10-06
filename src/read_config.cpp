@@ -108,6 +108,7 @@ void parse_inputfile(Configuration& config, const Node& node) {
    parse(plots, "forces_bins", config.forces_bins);
    parse(plots, "forces_set_1", config.forces_set_1);
    parse(plots, "forces_set_2", config.forces_set_2);
+   parse(plots, "forces_yrange", config.forces_yrange);
 
 
    parse(files, "time_start", config.time_start);

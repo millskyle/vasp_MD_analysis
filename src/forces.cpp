@@ -124,8 +124,8 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
 
          }
       }
-      cout << "\r" << endl;
    }
+   cout << "\r" << endl;
 
 
    for (int i=0; i<bins_square_sum.size(); i++) {
@@ -155,7 +155,7 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
    gnuplot->command(  
       + " 'forces_" 
       + vasprun->label 
-      + ".data' using 1:($2-$3):($2+$3) with filledcurves lc rgb '#FF4444' lw 0 title 'standard error',  " 
+      + ".data' using 1:($2-$3):($2+$3) with filledcurves lc rgb '#BBBBBB' lw 0 title 'standard error',  " 
       + " '' using 1:2 w l ls " + gnuplot->style() + " lw 1 title '" + vasprun->label + " ("+ config->forces_set_1.c_str() + " - " + config->forces_set_2.c_str() + ") ',"
       + " '' u 1:4 w l ls 14 lw 2 title 'Potential V(r)' ; "
       ,false);
@@ -188,7 +188,7 @@ int force_bond_projections(VasprunXML *vasprun, Configuration *config, GnuPlotSc
   //          cout << "E" << endl;
 //            cout << bins_count[i] << endl;
             //of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << 0 << "\n";
-            of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << bins_std_dev[i] << "\t" << -cum_sum[i] << "\n";
+            of << i*bin_width << "\t" << bins_sum[i]/bins_count[i] << "\t" << bins_std_dev[i] << "\t" << cum_sum[i] << "\n";
          }
       }
    }
@@ -208,7 +208,7 @@ int force_bond_projections_wrapper(Configuration *config) {
    GnuPlotScript gnuplot ;
    gnuplot.initialise("forces","Force","Separation distance [Angstrom]","Average force [eV/Angstrom]","force.pdf");
    gnuplot.command("set style fill transparent solid 0.40 noborder");
-//   gnuplot.command("set yrange [-10:10]");
+   gnuplot.command("set yrange " + config->forces_yrange +  " ");
    gnuplot.command("plot 0 lc rgb '#CCCCCC' notitle,  ", false );
 
 
